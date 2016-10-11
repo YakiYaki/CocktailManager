@@ -9,8 +9,8 @@ def __log_init__():
 	logging.info("It's works!");
 
 # Функция подключения к БД
-def connect(dbname=CocktailManager, user=postgres):
-	conn = psycopg2.connect("dbname=%s, user=%s", (dbname, user))  # Создаём подключение
+def connect(dbname=CocktailManager, user=postgres, password=qwerty12345):
+	conn = psycopg2.connect("dbname=%s, user=%s, password=%s", (dbname, user, password))  # Создаём подключение
 	cur = conn.cursor()  # Создаём курсор для выполнения операций с БД
 
 # Функция загрузки SQL скрипта
