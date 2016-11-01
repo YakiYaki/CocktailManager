@@ -49,6 +49,7 @@ CREATE TABLE "Таблица связей" (
 	"ID" serial NOT NULL UNIQUE,
 	"ID коктейля" integer NOT NULL,
 	"ID ингредиента" integer NOT NULL,
+	"Количество ингредиентов" integer NOT NULL,
 	CONSTRAINT Таблица связей_pk PRIMARY KEY ("ID")
 ) WITH (
   OIDS=FALSE
@@ -64,4 +65,5 @@ ALTER TABLE "Предпочтения" ADD CONSTRAINT "Предпочтения_
 
 ALTER TABLE "Таблица связей" ADD CONSTRAINT "Таблица связей_fk0" FOREIGN KEY ("ID коктейля") REFERENCES "Коктейли"("ID");
 ALTER TABLE "Таблица связей" ADD CONSTRAINT "Таблица связей_fk1" FOREIGN KEY ("ID ингредиента") REFERENCES "Ингредиенты"("ID");
+
 
