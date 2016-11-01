@@ -1,10 +1,10 @@
 import telebot
 import sys
-import config 
+from config import Configuration 
 from user import User
 from cocktail import Cocktail
  
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot(Configuration.TOKEN)
 LIST_FROM_MENU = ["First_Cocktail", "Second_Cocktail", "Third_Cocktail"]
 FAVOURITE_COCKTAILS = ["Second_Cocktail", "Third_Cocktail"]
 
