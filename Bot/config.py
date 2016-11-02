@@ -1,2 +1,13 @@
+from configparser import ConfigParser
 
-token = "292100794:AAFFSjW3zjvur6DiGhqdue_cGrvaO-1yf0w"
+class Configuration:
+    
+    __init__(self):
+        self.config = ConfigParser()
+        self.config.read(config_path)
+    
+    def config_get(self, section, option, default=None):
+        try:
+            return self.config.get(section, option)
+        except (NoSectionError, NoOptionError):
+            return default
