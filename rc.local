@@ -1,3 +1,0 @@
-#!/bin/sh -e
-/usr/local/bin/uwsgi --ini usr/local/CocktailBot/CocktailManager.ini --uid www-data --gid www-data 
-exit 0
