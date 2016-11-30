@@ -1,9 +1,9 @@
-# CocktailManager
+## CocktailManager
 Cocktail Manager - bot for Telegram. 
 
 Для развертывания необходимо запустить Dockerfile.
 
-# Получение самоподписанного сертификата (self-signed certificate)
+### Получение самоподписанного сертификата (self-signed certificate)
 
 Сертификат необходим для настройки *WebHook*. 
 
