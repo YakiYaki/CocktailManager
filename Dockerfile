@@ -1,9 +1,14 @@
-#Основные настройки
+# Основные настройки
 FROM ubuntu:16.04
+# Сохраним путь к репозиторию
+ENV cocktail_rep https://raw.githubusercontent.com/YakiYaki/CocktailManager/master
+ENV container_name CocktailBotContainer
+ENV project_name CocktailManager
+ENV app_name manager
 
-WORKDIR /usr/local
-RUN [“mkdir”, “CocktailBotHome”]
-WORKDIR /usr/local/CocktailBotHome
+WORKDIR /data
+RUN [“mkdir”, “$container_name”]
+WORKDIR /data/$container_name
 
 # Установка необходимых компонентов
 RUN [“apt-get”, “update”]
@@ -11,8 +16,8 @@ RUN [“apt-get”, “install”, “-y”, “nginx”, “python3”, “pyth
 
 # Получение сертификата
 RUN [“mkdir”, “/etc/nginx/ssl”]
-ADD https://raw.githubusercontent.com/YakiYaki/CocktailManager/master/sertificates/nginx-selfsigned.key /etc/ssl/nginx-selfsigned.key
-ADD https://raw.githubusercontent.com/YakiYaki/CocktailManager/master/sertificates/nginx-selfsigned.crt /etc/ssl/nginx-selfsigned.crt
+ADD ${cocktail_rep}/sertificates/nginx-selfsigned.key /etc/ssl/nginx-selfsigned.key
+ADD ${cocktail_rep}/sertificates/nginx-selfsigned.crt /etc/ssl/nginx-selfsigned.crt
 
 # Создание виртуального окружения (ВО)
 RUN [“python3”, “-m”, “venv”, “env”]
@@ -21,14 +26,14 @@ RUN [“python3”, “-m”, “venv”, “env”]
 RUN [“source”, “/env/bin/activate”]
 
 # Получаем список необходимых компонентов
-ADD https://raw.githubusercontent.com/YakiYaki/CocktailManager/master/conf/requirements.txt requirements.txt
+ADD ${cocktail_rep}/conf/requirements.txt requirements.txt
 # Получаем файл с настройками nginx
-ADD https://raw.githubusercontent.com/YakiYaki/CocktailManager/master/conf/CocktailManager-nginx.conf requirements.txt
+ADD ${cocktail_rep}/conf/CocktailManager-nginx.conf requirements.txt
 
 #Установка необходимых компонентов в ВО
 RUN [“pip3”, “install”, “-r”, “requirements.txt”]
 RUN [“rm”, “rc.local”]
-ADD https://raw.githubusercontent.com/YakiYaki/CocktailManager/master/conf/rc.local /etc/rc.local
+ADD ${cocktail_rep}/conf/rc.local /etc/rc.local
 
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CoctailManager-nginx.conf, чтобы nginx увидел его
 RUN [“ln”, “-s”, “CocktailManager-nginx.conf”, “/etc/nginx/sites-enabled/”]
@@ -63,6 +68,6 @@ RUN [“pip3”, “install”, “uwsgi”]
 # Запускаем наш сервер
 RUN [“service”, “nginx”, “restart”]
 ENTRYPOINT [“uwsgi --ini”]
-CMD [“CoctailManager/conf/CocktailManager.ini”]
+CMD [“CocktailManager/conf/CocktailManager.ini”]
 
 EXPOSE 443
