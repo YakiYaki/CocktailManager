@@ -8,11 +8,17 @@ Cocktail Manager - bot for Telegram.
 Сертификат необходим для настройки *WebHook*. 
 
 Сначала устанавливаем `openssl`:
-`sudo apt-get install openssl`
+
+    sudo apt-get install openssl
+    
 Затем перейдем в любую директорию и сгенерируем приватный ключ:
-`openssl genrsa -out webhook_pkey.pem 2048`
+
+    openssl genrsa -out webhook_pkey.pem 2048
+
 В текущей директории должен появиться файл, название которого мы указываем после ключа `-out`. 
+
 Генерируем самоподписанный сертификат:
-`openssl req -new -x509 -days 3650 -key webhook_pkey.pem -out webhook_cert.pem`
+
+    openssl req -new -x509 -days 3650 -key webhook_pkey.pem -out webhook_cert.pem
 
 
