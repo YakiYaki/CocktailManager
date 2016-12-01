@@ -1,7 +1,21 @@
 ## CocktailManager
 Cocktail Manager - bot for Telegram. 
 
-Для развертывания необходимо запустить Dockerfile.
+### Развертывание
+
+Для развертывания необходимо:
+
+1. Скопировать себе репозиторий. 
+2. Перейти в директорию *Container*
+3. Сгенерировать самоподписанный сертификат. (инструкция ниже)
+4. Далее запустить контейнер:
+
+    docker run
+
+или собрать свой docker-образ командой:
+
+    docker build -t <image_name> .
+
 
 ### Получение самоподписанного сертификата (self-signed certificate)
 
@@ -33,5 +47,7 @@ The Common Name may be one of the following:
 4. A Private IP address (e.g. "192.168.0.1")
 5. A Public IP address (e.g. "202.144.8.10")
 
-В нашем случае это *student.bmstu.cloud*.
+Удалить все контейнеры: `docker rm $(docker ps -aq)`
+
+Удалить образ: `docker rmi IMAGE_ID`
 
