@@ -4,4 +4,4 @@ config.ini
 # Игнорируем все папки conf (у нас там все конфигурационные файлы)
 # conf/*
 # Игнорируем содержимое папки сертификатов
-conf/sertificates/
+conf/certificates/
