@@ -36,8 +36,8 @@ RUN mkdir media
 # Получаем файл с настройками nginx
 ADD conf/CocktailManager-nginx.conf conf/CocktailManager-nginx.conf
 # Получение сертификата
-ADD webhook_selfsigned_cert.key ssl/webhook_selfsigned_cert.key
-ADD webhook_selfsigned_cert.pem ssl/webhook_selfsigned_cert.pem
+ADD certificates/webhook_selfsigned_cert.key ssl/webhook_selfsigned_cert.key
+ADD certificates/webhook_selfsigned_cert.pem ssl/webhook_selfsigned_cert.pem
 
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CoctailManager-nginx.conf, чтобы nginx увидел его
 RUN ln -s conf/CocktailManager-nginx.conf /etc/nginx/sites-enabled/
