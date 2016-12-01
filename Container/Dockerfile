@@ -11,62 +11,60 @@ ENV container_name=CocktailBotHome project_name=CocktailManager app_name=manager
 RUN [“mkdir”, “data”]
 WORKDIR /data
 RUN [“mkdir”, “$container_name”]
-WORKDIR /data/$container_name
+WORKDIR $container_name
 
 # Установка необходимых компонентов
 RUN [“apt-get”, “update”]
 RUN [“apt-get”, “install”, “-y”, “nginx”, “python3”, “python3.5-dev”, “python3-pip”, “python3-venv”, “git”]
 
-# Получение сертификата
-RUN [“mkdir”, “ssl”]
-ADD certificates/webhook_selfsigned_cert.key ssl/webhook_selfsigned_cert.key
-ADD certificates/webhook_selfsigned_cert.pem ssl/webhook_selfsigned_cert.pem
-
 # Создание виртуального окружения (ВО)
 RUN [“python3”, “-m”, “venv”, “env”]
-
 # Активация ВО
 RUN [“source”, “/env/bin/activate”]
 
 # Получаем список необходимых компонентов
-ADD ${cocktail_rep}/conf/requirements.txt requirements.txt
-# Получаем файл с настройками nginx
-ADD ${cocktail_rep}/conf/CocktailManager-nginx.conf requirements.txt
-
-#Установка необходимых компонентов в ВО
+ADD conf/requirements.txt requirements.txt
+# Установка необходимых компонентов в ВО
 RUN [“pip3”, “install”, “-r”, “requirements.txt”]
-RUN [“rm”, “rc.local”]
-ADD ${cocktail_rep}/conf/rc.local /etc/rc.local
-
-# В папке /etc/nginx/sites-enabled создаем ссылку на файл CoctailManager-nginx.conf, чтобы nginx увидел его
-RUN [“ln”, “-s”, “CocktailManager-nginx.conf”, “/etc/nginx/sites-enabled/”]
-
-
-# Разворачивание проекта
-# Установка пользователя
-USER www-data:www-data
-
 # Создаем проект Django
 RUN [“django-admin.py”, “startproject”, “CocktailManager”]
-# Дополняем проект нужными файлами
-RUN [“git”, “clone”, “https://github.com/YakiYaki/CocktailManager.git”]
 
-# Переписываем setting.py проекта Django
-RUN [“cp”, “CoctailManager/conf/settings.py”, “CoctailManager/CocktailManager/”]
+WORKDIR $project_name
+
+# Получаем файл с настройками nginx
+ADD conf/CocktailManager-nginx.conf conf/CocktailManager-nginx.conf
+# Получение сертификата
+ADD certificates/webhook_selfsigned_cert.key ssl/webhook_selfsigned_cert.key
+ADD certificates/webhook_selfsigned_cert.pem ssl/webhook_selfsigned_cert.pem
+
+# В папке /etc/nginx/sites-enabled создаем ссылку на файл CoctailManager-nginx.conf, чтобы nginx увидел его
+RUN [“ln”, “-s”, “conf/CocktailManager-nginx.conf”, “/etc/nginx/sites-enabled/”]
 
 # Добавление необходимых данных для uwsgi
 ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi_params
+
+# Переписываем setting.py проекта Django
+RUN [“cp”, “conf/settings.py”, “CocktailManager/”]
 # Собирает статические файлы в STATIC_ROOT
 RUN [“python3”, “CocktailManager/manage.py”, “collectstatic”]
 
+RUN ["mkdir", "static"]
+RUN ["mkdir", "media"]
+
+WORKDIR /etc
+RUN [“rm”, "-f", “rc.local”]
+ADD conf/rc.local /etc/rc.local
+
+#WORKDIR /data/${container_name}/${project_name}/conf
+
+# Установка пользователя
+USER www-data:www-data
 
 # Отключаем ВО
 RUN [“deactivate”]
 
-
 # Устанавливаем uwsgi глобально
 RUN [“pip3”, “install”, “uwsgi”]
-
 
 # Запускаем наш сервер
 RUN [“service”, “nginx”, “restart”]
