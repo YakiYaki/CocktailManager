@@ -4,12 +4,9 @@ FROM ubuntu:16.04
 # Переменные
 # Путь к репозиторию
 ENV cocktail_rep https://raw.githubusercontent.com/YakiYaki/CocktailManager/master
-# Имя директории контейнера
-ENV container_name CocktailBotHome
-# Имя директории проекта (имя проекта Django)
-ENV project_name CocktailManager
-# Имя приложения Django
-ENV app_name manager
+# Имя директории контейнера, имя директории проекта (имя проекта Django), имя приложения Django
+ENV container_name=CocktailBotHome project_name=CocktailManager app_name=manager
+
 
 RUN [“mkdir”, “data”]
 WORKDIR /data
@@ -22,8 +19,8 @@ RUN [“apt-get”, “install”, “-y”, “nginx”, “python3”, “pyth
 
 # Получение сертификата
 RUN [“mkdir”, “ssl”]
-ADD ${cocktail_rep}/sertificates/nginx-selfsigned.key /etc/ssl/nginx-selfsigned.key
-ADD ${cocktail_rep}/sertificates/nginx-selfsigned.crt /etc/ssl/nginx-selfsigned.crt
+ADD certificates/webhook_selfsigned_cert.key ssl/webhook_selfsigned_cert.key
+ADD certificates/webhook_selfsigned_cert.pem ssl/webhook_selfsigned_cert.pem
 
 # Создание виртуального окружения (ВО)
 RUN [“python3”, “-m”, “venv”, “env”]
