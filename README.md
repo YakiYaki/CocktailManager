@@ -47,7 +47,10 @@ The Common Name may be one of the following:
 4. A Private IP address (e.g. "192.168.0.1")
 5. A Public IP address (e.g. "202.144.8.10")
 
-Удалить все контейнеры: `docker rm $(docker ps -aq)`
+### Некоторые команды Docker
 
-Удалить образ: `docker rmi IMAGE_ID`
+* Просмотр всех образов: `docker images`
+* Просмотр всех контейнеров: `docker ps -a` или только их ID `docker ps -aq`
+* Удалить все контейнеры: `docker rm $(docker ps -aq)`
+* Удалить образ: `docker rmi IMAGE_ID`
 
