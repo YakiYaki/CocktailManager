@@ -15,8 +15,7 @@ Cocktail Manager - bot for Telegram.
 3. Создать папку *certificates* и в ней сгенерировать самоподписанный сертификат. (инструкция ниже)
 4. Собрать docker-образ командой:
 
-    docker build -t [image_name] .
-
+    docker build -t image_name .
 
 ### Получение самоподписанного сертификата (self-signed certificate)
 
@@ -56,3 +55,10 @@ The Common Name may be one of the following:
 * Удалить все контейнеры: `docker rm $(docker ps -aq)`
 * Удалить образ: `docker rmi IMAGE_ID`
 
+### Ставим WebHook
+
+If your site is already signed, then you can use the URL method we’ve used for getupdates and sendmessage to set up your webhook. However, if, like me, you’ve self signed your cert, you’ll need to upload your cert as a file, and telegram wont accept this with the URL method as a string! Thankfully, this process is simple thanks to the Linux command line. In a terminal, type:
+
+    curl -F "url=https://your_domain.com/where-the-script-will-be/bot-script.py" -F "certificate=@/location/of/cert/webhook_selfsigned_cert.pem" https://api.telegram.org/bot*BOT_TOKEN*/setWebhook
+
+The final URL is simply calling the setWebhook method on your bot token. That should be your webhook set up. You wont be able to call the getUpdates method anymore, as the webhook will block it.
