@@ -7,7 +7,6 @@ ENV cocktail_rep https://raw.githubusercontent.com/YakiYaki/CocktailManager/mast
 # Имя директории контейнера, имя директории проекта (имя проекта Django), имя приложения Django
 ENV container_name=CocktailBotHome project_name=CocktailManager app_name=manager
 
-
 RUN mkdir data
 WORKDIR /data
 RUN mkdir $container_name
@@ -15,29 +14,28 @@ WORKDIR $container_name
 
 # Установка необходимых компонентов
 RUN apt-get update
-RUN apt-get install -y nginx python3 python3.5-dev python3-pip python3-venv git
-
-# Создание виртуального окружения (ВО)
-RUN python3 -m venv env
-# Активация ВО
-RUN . env/bin/activate
+RUN apt-get install -y nginx python3 python3.5-dev python3-pip git
 
 # Получаем список необходимых компонентов
 ADD conf/requirements.txt requirements.txt
 # Установка необходимых компонентов в ВО
 RUN pip3 install -r requirements.txt
+
 # Создаем проект Django
 RUN django-admin.py startproject CocktailManager
-
 WORKDIR $project_name
+# Создаем приложение Django
+RUN python3 manage.py startapp $app_name
 
 RUN mkdir static
 RUN mkdir media
 # Получаем файл с настройками nginx
 ADD conf/CocktailManager-nginx.conf conf/CocktailManager-nginx.conf
 # Получение сертификата
-ADD certificates/webhook_selfsigned_cert.key ssl/webhook_selfsigned_cert.key
-ADD certificates/webhook_selfsigned_cert.pem ssl/webhook_selfsigned_cert.pem
+RUN apt-get install openssl
+ADD ssl.ini ssl/ssl.ini
+RUN openssl genrsa -out ssl/webhook_selfsigned_cert.key 2048
+RUN /bin/sh -c "cat ssl/ssl.ini | openssl req -new -x509 -days 3650 -key ssl/webhook_selfsigned_cert.key -out ssl/webhook_selfsigned_cert.pem"
 
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CoctailManager-nginx.conf, чтобы nginx увидел его
 RUN ln -s conf/CocktailManager-nginx.conf /etc/nginx/sites-enabled/
@@ -54,18 +52,18 @@ WORKDIR /etc
 RUN rm -f rc.local
 ADD conf/rc.local /etc/rc.local
 
-# Отключаем ВО
-#RUN /bin/bash deactivate
-
 # Устанавливаем uwsgi глобально
 RUN pip3 install uwsgi
+
+# Перезапускаем nginx
+RUN service nginx restart
 
 # Установка пользователя
 USER www-data:www-data
 
 # Запускаем наш сервер
-#RUN service nginx restart
-#ENTRYPOINT [“uwsgi --ini”]
-#CMD [“CocktailManager/conf/CocktailManager.ini”]
+WORKDIR /data/$container_name/$project_name
+ADD conf/CocktailManager.ini CocktailManager.ini
+ENTRYPOINT uwsgi --ini CocktailManager.ini
 
 EXPOSE 443
