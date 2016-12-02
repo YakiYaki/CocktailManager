@@ -3,16 +3,17 @@ Cocktail Manager - bot for Telegram.
 
 ### Развертывание
 
-Для развертывания необходимо:
+## Установка Docker
+
+* Debian: https://docs.docker.com/engine/installation/linux/debian/
+* Ubuntu: http://cyber01.ru/manuals/ustanovka-i-ispolzovanie-docker-v-ubuntu-15-04/
+
+После установки Dokcer разворачиваем проект:
 
 1. Скопировать себе репозиторий. 
 2. Перейти в директорию *Container*
-3. Сгенерировать самоподписанный сертификат. (инструкция ниже)
-4. Далее запустить контейнер:
-
-    docker run
-
-или собрать свой docker-образ командой:
+3. Создать папку certificates и в ней сгенерировать самоподписанный сертификат. (инструкция ниже)
+4. Собрать docker-образ командой:
 
     docker build -t <image_name> .
 
@@ -49,6 +50,7 @@ The Common Name may be one of the following:
 
 ### Некоторые команды Docker
 
+* Просмотр информации: `docker info`
 * Просмотр всех образов: `docker images`
 * Просмотр всех контейнеров: `docker ps -a` или только их ID `docker ps -aq`
 * Удалить все контейнеры: `docker rm $(docker ps -aq)`
