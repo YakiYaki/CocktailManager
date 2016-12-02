@@ -3,16 +3,17 @@ Cocktail Manager - bot for Telegram.
 
 ### Развертывание
 
-Для развертывания необходимо:
+### Установка Docker
+
+* Debian: https://docs.docker.com/engine/installation/linux/debian/
+* Ubuntu: http://cyber01.ru/manuals/ustanovka-i-ispolzovanie-docker-v-ubuntu-15-04/
+
+После установки Dokcer разворачиваем проект:
 
 1. Скопировать себе репозиторий. 
 2. Перейти в директорию *Container*
-3. Сгенерировать самоподписанный сертификат. (инструкция ниже)
-4. Далее запустить контейнер:
-
-    docker run
-
-или собрать свой docker-образ командой:
+3. Создать папку certificates и в ней сгенерировать самоподписанный сертификат. (инструкция ниже)
+4. Собрать docker-образ командой:
 
     docker build -t <image_name> .
 
@@ -27,13 +28,13 @@ Cocktail Manager - bot for Telegram.
     
 Затем перейдем в любую директорию и сгенерируем приватный ключ:
 
-    openssl genrsa -out webhook_pkey.pem 2048
+    openssl genrsa -out webhook_selfsigned_cert.key 2048
 
 В текущей директории должен появиться файл, название которого мы указываем после ключа `-out`. 
 
 Генерируем самоподписанный сертификат:
 
-    openssl req -new -x509 -days 3650 -key webhook_pkey.pem -out webhook_cert.pem
+    openssl req -new -x509 -days 3650 -key webhook_selfsigned_cert.key -out webhook_selfsigned_cert.pem
 
 Создание (`-new`) self-signed сертификата (`-x509`) для использования в качестве сертификата сервера или сертификата CA. Сертификат создается с использованием секретного ключа `-key`. Создаваемый сертификат будет действителен в течение 3650 дней (`-days`).
 
@@ -49,6 +50,7 @@ The Common Name may be one of the following:
 
 ### Некоторые команды Docker
 
+* Просмотр информации: `docker info`
 * Просмотр всех образов: `docker images`
 * Просмотр всех контейнеров: `docker ps -a` или только их ID `docker ps -aq`
 * Удалить все контейнеры: `docker rm $(docker ps -aq)`
