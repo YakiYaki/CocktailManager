@@ -61,8 +61,7 @@ RUN pip3 install uwsgi
 
 RUN mkdir /var/uwsgi
 RUN mkdir /var/uwsgi/log
-RUN chown www-data:www-data /var/uwsgi
-RUN chown www-data:www-data /var/uwsgi/log
+RUN chown www-data:www-data -R /var/uwsgi
 
 # Перезапускаем nginx
 RUN service nginx restart
