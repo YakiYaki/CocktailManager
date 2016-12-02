@@ -3,7 +3,7 @@ Cocktail Manager - bot for Telegram.
 
 ### Развертывание
 
-## Установка Docker
+### Установка Docker
 
 * Debian: https://docs.docker.com/engine/installation/linux/debian/
 * Ubuntu: http://cyber01.ru/manuals/ustanovka-i-ispolzovanie-docker-v-ubuntu-15-04/
@@ -28,13 +28,13 @@ Cocktail Manager - bot for Telegram.
     
 Затем перейдем в любую директорию и сгенерируем приватный ключ:
 
-    openssl genrsa -out webhook_pkey.pem 2048
+    openssl genrsa -out webhook_selfsigned_cert.key 2048
 
 В текущей директории должен появиться файл, название которого мы указываем после ключа `-out`. 
 
 Генерируем самоподписанный сертификат:
 
-    openssl req -new -x509 -days 3650 -key webhook_pkey.pem -out webhook_cert.pem
+    openssl req -new -x509 -days 3650 -key webhook_selfsigned_cert.key -out webhook_selfsigned_cert.pem
 
 Создание (`-new`) self-signed сертификата (`-x509`) для использования в качестве сертификата сервера или сертификата CA. Сертификат создается с использованием секретного ключа `-key`. Создаваемый сертификат будет действителен в течение 3650 дней (`-days`).
 
