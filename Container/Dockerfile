@@ -27,6 +27,11 @@ WORKDIR $project_name
 # Создаем приложение Django
 RUN python3 manage.py startapp $app_name
 
+# Переписываем setting.py проекта Django
+COPY conf/settings.py CocktailManager/
+
+RUN python3 manage.py migrate
+
 RUN mkdir static
 RUN mkdir media
 # Получаем файл с настройками nginx
@@ -43,8 +48,7 @@ RUN ln -s conf/CocktailManager-nginx.conf /etc/nginx/sites-enabled/
 # Добавление необходимых данных для uwsgi
 ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi_params
 
-# Переписываем setting.py проекта Django
-COPY conf/settings.py CocktailManager/
+
 # Собирает статические файлы в STATIC_ROOT
 RUN /bin/sh -c "echo yes | python3 manage.py collectstatic"
 
