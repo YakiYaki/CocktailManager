@@ -64,8 +64,8 @@ RUN pip3 install uwsgi
 USER www-data:www-data
 
 # Запускаем наш сервер
-RUN service nginx restart
-ENTRYPOINT [“uwsgi --ini”]
-CMD [“CocktailManager/conf/CocktailManager.ini”]
+#RUN service nginx restart
+#ENTRYPOINT [“uwsgi --ini”]
+#CMD [“CocktailManager/conf/CocktailManager.ini”]
 
 EXPOSE 443
