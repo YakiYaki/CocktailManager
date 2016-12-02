@@ -12,10 +12,10 @@ Cocktail Manager - bot for Telegram.
 
 1. Скопировать себе репозиторий. 
 2. Перейти в директорию *Container*
-3. Создать папку certificates и в ней сгенерировать самоподписанный сертификат. (инструкция ниже)
+3. Создать папку *certificates* и в ней сгенерировать самоподписанный сертификат. (инструкция ниже)
 4. Собрать docker-образ командой:
 
-    docker build -t <image_name> .
+    docker build -t [image_name] .
 
 
 ### Получение самоподписанного сертификата (self-signed certificate)

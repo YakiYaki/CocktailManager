@@ -55,6 +55,9 @@ ADD conf/rc.local /etc/rc.local
 # Устанавливаем uwsgi глобально
 RUN pip3 install uwsgi
 
+RUN mkdir /var/uwsgi
+RUN chown www-data:www-data /var/uwsgi
+
 # Перезапускаем nginx
 RUN service nginx restart
 
