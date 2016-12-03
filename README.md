@@ -27,9 +27,13 @@ Cocktail Manager - bot for Telegram.
    **image_id** - id образа, контейнер с которого мы создаём
    
 Флаги:
+
    -i - интерактивный режим, связывающий вашу консоль с контейнером
+   
    -t - разрешить tty
+   
    -d - опциональный, запускает контейнер в качестве демона
+   
 
 ### Сборка (для разработчиков)
 
@@ -51,15 +55,15 @@ Cocktail Manager - bot for Telegram.
 В директории *Container/* открываете файл *ssl.ini*
 
 Пишете информацию о своей компании в этот файл (оставляете пустую строку для значения по умолчанию)
-Заполняете файл в формате (в *[]* значение по умолчанию):
+Заполняете файл в формате (в [] значение по умолчанию):
 
-    Country Name (2 letter code) [AU]: *RU*
-    State or Province Name (full name) [Some-State]: *Russian Federation*
-    Locality Name (eg, city) []: *Moscow*
-    Organization Name (eg, company) [Internet Widgits Pty Ltd]: *Cocktail Manager Inc.*
+    Country Name (2 letter code) [AU]: RU
+    State or Province Name (full name) [Some-State]: Russian Federation
+    Locality Name (eg, city) []: Moscow
+    Organization Name (eg, company) [Internet Widgits Pty Ltd]: Cocktail Manager Inc.
     Organizational Unit Name (eg, section) []:
-    Common Name (e.g. server FQDN or YOUR name) []: *student.bmstu.cloud:10264*
-    Email Address []: *N02@yandex.ru*
+    Common Name (e.g. server FQDN or YOUR name) []: student.bmstu.cloud:10264
+    Email Address []: N02@yandex.ru
 
 # Настройки приложения uwsgi
 
@@ -95,7 +99,7 @@ Cocktail Manager - bot for Telegram.
 # Ставим WebHook
 
 
-    *curl -F "url=https://your_domain.com/where-the-script-will-be/bot-script.py" -F "certificate=@/location/of/cert/webhook_selfsigned_cert.pem" https://api.telegram.org/bot**BOT_TOKEN**/setWebhook*
+    curl -F "url=https://your_domain.com/where-the-script-will-be/bot-script.py" -F "certificate=@/location/of/cert/webhook_selfsigned_cert.pem" https://api.telegram.org/bot**BOT_TOKEN**/setWebhook
 
 **BOT TOKEN** - токен, полученный вашим ботом от Bot Father
 
