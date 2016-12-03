@@ -14,7 +14,7 @@ WORKDIR $container_name
 
 # Установка необходимых компонентов
 RUN apt-get update
-RUN apt-get install -y nginx python3 python3.5-dev python3-pip git
+RUN apt-get install -y nginx python3 python3.5-dev python3-pip git postgresql postgresql-contrib libpq-dev
 
 # Получаем список необходимых компонентов
 ADD conf/requirements.txt requirements.txt
@@ -25,6 +25,11 @@ RUN pip3 install -r requirements.txt
 # Создаем проект Django
 RUN django-admin.py startproject CocktailManager
 WORKDIR $project_name
+
+# Настраиваем базу данных PostgreSQL
+RUN sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgrespass';"
+ADD conf/db.ini conf/db.ini
+RUN sudo -u postgres psql -f "conf/db.ini"
 
 # Создаем приложение Django
 RUN python3 manage.py startapp $app_name
