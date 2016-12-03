@@ -18,7 +18,7 @@ Cocktail Manager - bot for Telegram.
 
 После установки Dokcer создаём и запускаем контейнер из образа:
 
-   *docker run -itp [-d] **Iport**:**Oport** *image_id
+    docker run -itp [-d] **Iport**:**Oport** **image_id**
    
    **Iport** - порт, который разрешён в Dockerfile и с которого будет пробрасываться трафик на вашей машине
    **Oport** - порт, который будет открыт внутри контейнера, на котором будет слушать наше приложение
@@ -51,13 +51,13 @@ Cocktail Manager - bot for Telegram.
 Пишете информацию о своей компании в этот файл (оставляете пустую строку для значения по умолчанию)
 Заполняете файл в формате (в *[]* значение по умолчанию):
 
-Country Name (2 letter code) [AU]: *RU*
-State or Province Name (full name) [Some-State]: *Russian Federation*
-Locality Name (eg, city) []: *Moscow*
-Organization Name (eg, company) [Internet Widgits Pty Ltd]: *Cocktail Manager Inc.*
-Organizational Unit Name (eg, section) []:
-Common Name (e.g. server FQDN or YOUR name) []: *student.bmstu.cloud:10264*
-Email Address []: *N02@yandex.ru*
+    Country Name (2 letter code) [AU]: *RU*
+    State or Province Name (full name) [Some-State]: *Russian Federation*
+    Locality Name (eg, city) []: *Moscow*
+    Organization Name (eg, company) [Internet Widgits Pty Ltd]: *Cocktail Manager Inc.*
+    Organizational Unit Name (eg, section) []:
+    Common Name (e.g. server FQDN or YOUR name) []: *student.bmstu.cloud:10264*
+    Email Address []: *N02@yandex.ru*
 
 # Настройки приложения uwsgi
 
@@ -93,7 +93,7 @@ Email Address []: *N02@yandex.ru*
 # Ставим WebHook
 
 
-*curl -F "url=https://your_domain.com/where-the-script-will-be/bot-script.py" -F "certificate=@/location/of/cert/webhook_selfsigned_cert.pem" https://api.telegram.org/bot**BOT_TOKEN**/setWebhook*
+    *curl -F "url=https://your_domain.com/where-the-script-will-be/bot-script.py" -F "certificate=@/location/of/cert/webhook_selfsigned_cert.pem" https://api.telegram.org/bot**BOT_TOKEN**/setWebhook*
 
 **BOT TOKEN** - токен, полученный вашим ботом от Bot Father
 
