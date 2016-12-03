@@ -1,17 +1,17 @@
-## CocktailManager
+# CocktailManager
 Cocktail Manager - bot for Telegram. 
 
-### Возможности бота
+## Возможности бота
 
     ...
 
-### Запуск из Telegram
+## Запуск из Telegram
 
     ...
 
-### Запуск сервера
+## Запуск сервера
 
-# Установка Docker
+### Установка Docker
 
 * Debian: https://docs.docker.com/engine/installation/linux/debian/
 * Ubuntu: http://cyber01.ru/manuals/ustanovka-i-ispolzovanie-docker-v-ubuntu-15-04/
@@ -35,9 +35,9 @@ Cocktail Manager - bot for Telegram.
    -d - опциональный, запускает контейнер в качестве демона
    
 
-### Сборка (для разработчиков)
+## Сборка (для разработчиков)
 
-# Установка Docker
+### Установка Docker
 
 * Debian: https://docs.docker.com/engine/installation/linux/debian/
 * Ubuntu: http://cyber01.ru/manuals/ustanovka-i-ispolzovanie-docker-v-ubuntu-15-04/
@@ -50,7 +50,7 @@ Cocktail Manager - bot for Telegram.
 
     docker build -t image_name .
 
-# Настройка самоподписанного сертификата (self-signed certificate)
+### Настройка самоподписанного сертификата (self-signed certificate)
 
 В директории *Container/* открываете файл *ssl.ini*
 
@@ -65,29 +65,29 @@ Cocktail Manager - bot for Telegram.
     Common Name (e.g. server FQDN or YOUR name) []: student.bmstu.cloud:10264
     Email Address []: N02@yandex.ru
 
-# Настройки приложения uwsgi
+### Настройки приложения uwsgi
 
 Смотреть в файле *conf/CocktailManager.ini*
 
-# Настройки автозагрузки
+### Настройки автозагрузки
 
 Смотреть в файле *conf/rc.local*
 Если хотите убрать приложение из автозагрузки, просто очистите этот файл
 
-# Настройки nginx
+### Настройки nginx
 
 Смотреть в файле *conf/CocktailManager-nginx.conf*
 Важно сменить значение в найстройке server_name на IP-адрес вашего сервера
 
-# Настройки Django
+### Настройки Django
 
 Смотреть в файле *conf/settings.py*
 
-# Необходимые пакеты для создания окружения
+### Необходимые пакеты для создания окружения
 
 Смотреть в файле *conf/requirements.txt*
 
-# Некоторые команды Docker
+### Некоторые команды Docker
 
 * Просмотр информации: `docker info`
 * Просмотр всех образов: `docker images`
@@ -96,8 +96,7 @@ Cocktail Manager - bot for Telegram.
 * Удалить образ: `docker rmi IMAGE_ID`
 * Удалить все образы: `docker rmi $(docker images -q)`
 
-# Ставим WebHook
-
+### Ставим WebHook
 
     curl -F "url=https://your_domain.com/where-the-script-will-be/bot-script.py" -F "certificate=@/location/of/cert/webhook_selfsigned_cert.pem" https://api.telegram.org/bot**BOT_TOKEN**/setWebhook
 
