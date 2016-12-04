@@ -38,7 +38,7 @@ RUN echo "local   all             postgres                                md5" >
 	echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
 	echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 
-ARG bot_token
+#ARG bot_token
 
 RUN mkdir data
 WORKDIR /data
@@ -79,8 +79,8 @@ RUN mkdir media
 # Получение сертификата
 RUN apt-get install openssl
 COPY conf/ssl.ini ssl/ssl.ini
-RUN openssl genrsa -out ssl/webhook_selfsigned_cert.key 2048
-RUN cat ssl/ssl.ini | openssl req -new -x509 -days 3650 -key ssl/webhook_selfsigned_cert.key -out ssl/webhook_selfsigned_cert.pem
+RUN cat ssl/ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
+	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem
 
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CoctailManager-nginx.conf, чтобы nginx увидел его
 RUN ln -s /data/$container_name/$project_name/conf/CocktailManager-nginx.conf /etc/nginx/sites-enabled/
@@ -110,11 +110,11 @@ ADD conf/CocktailManager.ini CocktailManager.ini
 # Запускаем наш сервер, установливаем WebHook, запускаем сервер базы данных, рестартим nginx и запускаем консоль
 ENTRYPOINT uwsgi --ini CocktailManager.ini &\
 		   curl -F "url=https://student.bmstu.cloud/bot" \
-				-F "certificate=/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
-				https://api.telegram.org/bot$bot_token/setWebhook &\
+				-F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
+				https://api.telegram.org/bot292100794:AAFFSjW3zjvur6DiGhqdue_cGrvaO-1yf0w/setWebhook &\
 		   service postgresql start &\
 		   service nginx restart &\
 		   clear &\
 		   /bin/bash 
 
-EXPOSE 443 5432
+EXPOSE 443 5432 
