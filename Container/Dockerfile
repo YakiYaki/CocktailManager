@@ -7,6 +7,8 @@ ENV cocktail_rep https://raw.githubusercontent.com/YakiYaki/CocktailManager/mast
 # Имя директории контейнера, имя директории проекта (имя проекта Django), имя приложения Django
 ENV container_name=CocktailBotHome project_name=CocktailManager app_name=manager
 
+ARG bot_token
+
 RUN mkdir data
 WORKDIR /data
 RUN mkdir $container_name
@@ -72,6 +74,11 @@ RUN chown www-data:www-data -R /var/uwsgi
 USER root:root
 WORKDIR /data/$container_name/$project_name
 ADD conf/CocktailManager.ini CocktailManager.ini
+
+# Установка WebHook'а
+RUN curl -F "url=https://student.bmstu.cloud/bot" \
+	-F "certificate=/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
+	https://api.telegram.org/bot$bot_token/setWebhook
 
 # Запускаем наш сервер, рестартим nginx и запускаем консоль
 ENTRYPOINT uwsgi --ini CocktailManager.ini & service nginx restart & clear & /bin/bash
