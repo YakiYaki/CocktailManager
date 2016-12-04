@@ -5,53 +5,54 @@ FROM ubuntu:16.04
 # Путь к репозиторию
 ENV cocktail_rep https://raw.githubusercontent.com/YakiYaki/CocktailManager/master
 # Имя директории контейнера, имя директории проекта (имя проекта Django), имя приложения Django
-ENV container_name=CocktailBotHome project_name=CocktailManager app_name=manager
+ENV container_name=CocktailBotHome \
+	project_name=CocktailManager \
+	app_name=manager
+
+# Установка необходимых компонентов
+RUN locale-gen "en_US.UTF-8" && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && locale &&\
+	apt-get update &&\
+	apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9.5 &&\
+	apt-get install -y nginx python3 python3.5-dev python3-pip git &&\
+	apt-get clean
+
+# Получаем список необходимых компонентов Python
+ADD conf/requirements.txt requirements.txt
+# Установка необходимых компонентов
+RUN pip3 install -r requirements.txt
+
+# Настраиваем базу данных PostgreSQL
+RUN echo "local   all             postgres                                md5" >> \
+	/etc/postgresql/9.5/main/pg_hba.conf &&\
+	echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
+	echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 
 RUN mkdir data
 WORKDIR /data
 RUN mkdir $container_name
 WORKDIR $container_name
 
-# Установка необходимых компонентов
-RUN apt-get update
-RUN apt-get install -y nginx python3 python3.5-dev python3-pip git
-#RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
-#RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-RUN apt-get -y install postgresql-9.5 libpq-dev postgresql-contrib-9.5
-
-# Получаем список необходимых компонентов
-ADD conf/requirements.txt requirements.txt
-
-# Установка необходимых компонентов в ВО
-RUN pip3 install -r requirements.txt
-
 # Создаем проект Django
-RUN django-admin.py startproject CocktailManager
+RUN django-admin.py startproject $project_name
 WORKDIR $project_name
-
-# Настраиваем базу данных PostgreSQL
-USER postgres
-RUN ps -ef | grep postgres
-ADD conf/pg_hba.conf /etc/postgresql/9.5/main/pg_hba.conf
-RUN cat /etc/postgresql/9.5/main/pg_hba.conf
-RUN ls -l /var/run/postgresql
-RUN ln -s /tmp/.s.PGSQL.5432 /var/run/postgresql/.s.PGSQL.5432
-RUN /etc/init.d/postgresql start
-RUN ps -ef | grep postgres
-RUN psql
-#--command "ALTER USER postgres WITH PASSWORD 'postgrespass';"
-ADD conf/db.ini conf/db.ini
-RUN psql -f "conf/db.ini"
-USER root:root
 
 # Создаем приложение Django
 RUN python3 manage.py startapp $app_name
-
 # Переписываем setting.py проекта Django
-COPY conf/settings.py CocktailManager/
+COPY conf/settings.py $project_name/
+COPY bot/models.py $app_name/
+ADD conf/db.ini conf/db.ini
 
-# Ловим миграции
-RUN python3 manage.py migrate
+RUN ls -l
+RUN ls -l $app_name/
+
+USER postgres
+RUN service postgresql start &&\
+	psql -f "conf/db.ini" &&\
+	sudo -su root &&\
+	python3 manage.py migrate &&\
+	python3 manage.py makemigrations
+USER root:root
 
 RUN mkdir static
 RUN mkdir media
@@ -94,4 +95,4 @@ ADD conf/CocktailManager.ini CocktailManager.ini
 # Запускаем наш сервер, рестартим nginx и запускаем консоль
 ENTRYPOINT uwsgi --ini CocktailManager.ini & service nginx restart & clear & /bin/bash
 
-EXPOSE 443
+EXPOSE 443 5432

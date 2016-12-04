@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'CocktailManager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'CocktailManagerDB',
+        'NAME': 'cocktails_db',
         'USER': 'barman',
-        'PASSWORD': '12345'
-        'HOST': '127.0.0.1'
+        'PASSWORD': '12345',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
