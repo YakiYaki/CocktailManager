@@ -21,7 +21,8 @@ RUN locale-gen "en_US.UTF-8" &&\
 	nginx \
 	python3 \
 	python3.5-dev \
-	python3-pip git &&\
+	python3-pip git \
+	curl &&\
 	
 	apt-get clean &&\
 	rm -rf /var/lib/apt/lists/*
@@ -55,7 +56,9 @@ COPY conf/settings.py $project_name/
 # Переписываем models.py приложения Django
 COPY bot/models.py $app_name/
 # Добавляем файл с созданием базы данных
-ADD conf/db.ini conf/db.ini
+COPY conf/db.ini conf/db.ini
+# Добавляем файл с настройками nginx
+COPY conf/CocktailManager-nginx.conf conf/CocktailManager-nginx.conf
 
 # Создаем базу данных
 USER postgres
@@ -73,12 +76,9 @@ RUN service postgresql start &&\
 RUN mkdir static
 RUN mkdir media
 
-# Добавляем файл с настройками nginx
-ADD conf/CocktailManager-nginx.conf conf/CocktailManager-nginx.conf
-
 # Получение сертификата
 RUN apt-get install openssl
-ADD ssl.ini ssl/ssl.ini
+COPY conf/ssl.ini ssl/ssl.ini
 RUN openssl genrsa -out ssl/webhook_selfsigned_cert.key 2048
 RUN cat ssl/ssl.ini | openssl req -new -x509 -days 3650 -key ssl/webhook_selfsigned_cert.key -out ssl/webhook_selfsigned_cert.pem
 
@@ -105,14 +105,16 @@ RUN mkdir /var/uwsgi/log
 RUN chown www-data:www-data -R /var/uwsgi
 
 WORKDIR /data/$container_name/$project_name
-ADD conf/CocktailManager.ini CocktailManager.ini
+ADD conf/CocktailManager.ini CocktailManager.ini 
 
-# Установка WebHook'а
-RUN curl -F "url=https://student.bmstu.cloud/bot" \
-	-F "certificate=/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
-	https://api.telegram.org/bot$bot_token/setWebhook
-
-# Запускаем наш сервер, запускаем сервер базы данных, рестартим nginx и запускаем консоль
-ENTRYPOINT uwsgi --ini CocktailManager.ini & service postgresql start & service nginx restart & clear & /bin/bash 
+# Запускаем наш сервер, установливаем WebHook, запускаем сервер базы данных, рестартим nginx и запускаем консоль
+ENTRYPOINT uwsgi --ini CocktailManager.ini &\
+		   curl -F "url=https://student.bmstu.cloud/bot" \
+				-F "certificate=/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
+				https://api.telegram.org/bot$bot_token/setWebhook &\
+		   service postgresql start &\
+		   service nginx restart &\
+		   clear &\
+		   /bin/bash 
 
 EXPOSE 443 5432
