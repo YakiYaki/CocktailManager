@@ -11,22 +11,36 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import socket
+from config import Configuration
+conf = Configuration()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '34=35$fxoa+phb_ygf1+ice-pf7ra$ma27tqipg919*7m)$zxz'
+SECRET_KEY = conf.config_get('django', 'secret_key')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if socket.gethostname() == 'linux-yaki':
+    # Настройки сервера разработки
+    
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = True
+    ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS = []
+else:
+    # Настройки production-сервера
 
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = False
+    ALLOWED_HOSTS = [conf.config_get('django', 'allowed_host')]
+
+    ADMINS = [
+        ('AG', 'brmgeometric@yandex.ru'),
+        ('NB', 'N02@yandex.ru')
+    ]
+
+
+WSGI_APPLICATION = 'CocktailManager.wsgi.application'
 
 # Application definition
 
@@ -37,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'manager',
 ]
 
 MIDDLEWARE = [
@@ -67,20 +82,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'CocktailManager.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
@@ -99,22 +100,32 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Database
+# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': conf.config_get('DB', 'db_name'),
+        'USER': conf.config_get('DB', 'db_username'),
+        'PASSWORD': conf.config_get('DB', 'db_password'),
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
-
 STATIC_URL = '/static/'
+STATIC_ROOT = '/data/CocktailManager/static/'
+

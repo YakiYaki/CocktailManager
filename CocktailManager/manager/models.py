@@ -29,4 +29,3 @@ class Cocktails(models.Model):
 class CocktailsChars(models.Model):
 	char_id = models.ForeignKey(Chars)
 	link_id = models.ForeignKey(Cocktails)
-
