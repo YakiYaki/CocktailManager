@@ -38,7 +38,12 @@ RUN echo "local   all             postgres                                md5" >
 	echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
 	echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 
-#ARG bot_token
+ARG bot_token
+ENV token bot${bot_token}
+ENV bot_url "url=https://student.bmstu.cloud/bot"
+ENV telegram_url https://api.telegram.org/${token}/setWebhook
+
+RUN echo ${telegram_url}
 
 RUN mkdir data
 WORKDIR /data
@@ -107,11 +112,10 @@ RUN chown www-data:www-data -R /var/uwsgi
 WORKDIR /data/$container_name/$project_name
 ADD conf/CocktailManager.ini CocktailManager.ini 
 
-# Запускаем наш сервер, установливаем WebHook, запускаем сервер базы данных, рестартим nginx и запускаем консоль
+# Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, рестартим nginx и запускаем консоль
 ENTRYPOINT uwsgi --ini CocktailManager.ini &\
-		   curl -F "url=https://student.bmstu.cloud/bot" \
-				-F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
-				https://api.telegram.org/bot292100794:AAFFSjW3zjvur6DiGhqdue_cGrvaO-1yf0w/setWebhook &\
+		   curl ${telegram_url} &\
+		   curl -F ${bot_url} -F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" ${telegram_url} &\
 		   service postgresql start &\
 		   service nginx restart &\
 		   clear &\
