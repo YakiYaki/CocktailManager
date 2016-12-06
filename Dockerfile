@@ -89,7 +89,6 @@ RUN echo "local   all             postgres                                md5" >
 # Создаем базу данных
 USER postgres
 RUN service postgresql start &&\
-	echo "CREATE DATABASE ${db_name} OWNER barman;" >> conf/CM-db.ini &&\
 	psql -f "conf/CM-db.ini" 
 
 # Начальные настройки и связывание с базой данных приложения Django
