@@ -5,3 +5,7 @@ config.ini
 # conf/*
 # Игнорируем содержимое папки сертификатов
 certificates/
+
+__pycache__/
+*.pyc
+migrations/
