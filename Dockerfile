@@ -19,6 +19,7 @@ ENV app_name manager
 ENV token bot${bot_token}
 ENV bot_url "url=https://${django_allowed_host}/bot/${bot_token}"
 ENV telegram_url https://api.telegram.org/${token}/setWebhook
+ENV email brmgeometric@yandex.ru
 
 # Установка необходимых компонентов
 RUN locale-gen "en_US.UTF-8" &&\
@@ -72,6 +73,8 @@ COPY conf/CM-ssl.ini ssl/CM-ssl.ini
 ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi_params
 # Добавляем настройки uwsgi
 COPY conf/CM-uwsgi.ini conf/CM-uwsgi.ini
+# Добавим данные для сертификата
+RUN echo "${django_allowed_host}\n${email}"
 
 # Генерирование сертификата
 RUN cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
