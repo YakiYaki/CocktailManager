@@ -1,14 +1,24 @@
   # Основные настройки
 FROM ubuntu:16.04
-MAINTAINER brmgeometric@yandex.ru + N02@yandex.ru
+MAINTAINER Artur Galikhaydarov (brmgeometric@yandex.ru), Nikita Boyarskikh N02@yandex.ru
+
+# Входные параметры
+# ВНИМАНИЕ! При вводе через --build-arg django_secret_key необходимо экранировать 
+# все скобочки ('(', ')') и знаки доллара ('$')
+ARG bot_token
+ARG django_allowed_host
+ARG django_secret_key
+ARG db_name
+ARG db_username
+ARG db_password
 
 # Переменные
-# Путь к репозиторию
-ENV cocktail_rep https://raw.githubusercontent.com/YakiYaki/CocktailManager/master
 # Имя директории контейнера, имя директории проекта (имя проекта Django), имя приложения Django
-ENV container_name=CocktailBotHome \
-	project_name=CocktailManager \
-	app_name=manager
+ENV project_name CocktailManager
+ENV app_name manager
+ENV token bot${bot_token}
+ENV bot_url "url=https://${django_allowed_host}/bot/${bot_token}"
+ENV telegram_url https://api.telegram.org/${token}/setWebhook
 
 # Установка необходимых компонентов
 RUN locale-gen "en_US.UTF-8" &&\
@@ -21,16 +31,54 @@ RUN locale-gen "en_US.UTF-8" &&\
 	nginx \
 	python3 \
 	python3.5-dev \
-	python3-pip git \
-	curl &&\
+	python3-pip \
+	git \
+	curl \
+	openssl &&\
 	
 	apt-get clean &&\
 	rm -rf /var/lib/apt/lists/*
 
+
+RUN mkdir data
+WORKDIR /data
+
 # Получаем список необходимых компонентов Python
-ADD conf/requirements.txt requirements.txt
+COPY conf/requirements.txt requirements.txt
 # Установка необходимых компонентов
 RUN pip3 install -r requirements.txt
+
+# Создаем папку для статики
+RUN mkdir /data/static
+# Копируем проект Django
+COPY CocktailManager/ CocktailManager/
+WORKDIR $project_name
+
+# Создание файла конфигурации с секретными данными
+RUN echo "[main]\n token = ${bot_token}\n[django]\n allowed_host = ${django_allowed_host}\n \
+secret_key = ${django_secret_key}\n[DB]\n db_name = ${db_name}\n db_username = ${db_username}\n \
+db_password = ${db_password}" > config.ini
+
+# Раскомментируйте, чтобы просмотреть созданый файл
+# RUN cat config.ini
+
+# Добавляем файл с созданием базы данных
+COPY conf/CM-db.ini conf/CM-db.ini
+# Добавляем файл с настройками nginx
+COPY conf/CM-nginx.conf conf/CM-nginx.conf
+# Добавляем настройки сертификата
+COPY conf/CM-ssl.ini ssl/CM-ssl.ini
+# Добавляем необходимые данные для uwsgi
+ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi_params
+# Добавляем настройки uwsgi
+COPY conf/CM-uwsgi.ini conf/CM-uwsgi.ini
+
+# Генерирование сертификата
+RUN cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
+	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem
+
+# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
+RUN ln -s /data/$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/
 
 # Настраиваем базу данных PostgreSQL
 RUN echo "local   all             postgres                                md5" >> \
@@ -38,38 +86,11 @@ RUN echo "local   all             postgres                                md5" >
 	echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
 	echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 
-ARG bot_token
-ENV token bot${bot_token}
-ENV bot_url "url=https://student.bmstu.cloud/bot"
-ENV telegram_url https://api.telegram.org/${token}/setWebhook
-
-RUN echo ${telegram_url}
-
-RUN mkdir data
-WORKDIR /data
-RUN mkdir $container_name
-WORKDIR $container_name
-
-# Создаем проект Django
-RUN django-admin.py startproject $project_name
-WORKDIR $project_name
-
-# Создаем приложение Django
-RUN python3 manage.py startapp $app_name
-# Переписываем setting.py проекта Django
-COPY conf/settings.py $project_name/
-# Переписываем models.py приложения Django
-COPY bot/models.py $app_name/
-# Добавляем файл с созданием базы данных
-COPY conf/db.ini conf/db.ini
-# Добавляем файл с настройками nginx
-COPY conf/CocktailManager-nginx.conf conf/CocktailManager-nginx.conf
-
 # Создаем базу данных
 USER postgres
 RUN service postgresql start &&\
 	echo "CREATE DATABASE ${db_name} OWNER barman;" >> conf/CM-db.ini &&\
-	psql -f "conf/CM-db.ini"
+	psql -f "conf/CM-db.ini" 
 
 # Начальные настройки и связывание с базой данных приложения Django
 USER root:root
@@ -77,22 +98,6 @@ RUN service postgresql start &&\
 	sleep 45 &&\
 	python3 manage.py makemigrations &&\
 	python3 manage.py migrate
-
-# Создаем папки для статики и медии
-RUN mkdir static
-RUN mkdir media
-
-# Получение сертификата
-RUN apt-get install openssl
-COPY conf/ssl.ini ssl/ssl.ini
-RUN cat ssl/ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
-	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem
-
-# В папке /etc/nginx/sites-enabled создаем ссылку на файл CoctailManager-nginx.conf, чтобы nginx увидел его
-RUN ln -s /data/$container_name/$project_name/conf/CocktailManager-nginx.conf /etc/nginx/sites-enabled/
-
-# Добавление необходимых данных для uwsgi
-ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi_params
 
 # Собирает статические файлы в STATIC_ROOT приложения Django
 RUN echo yes | python3 manage.py collectstatic
@@ -110,16 +115,20 @@ RUN mkdir /var/uwsgi
 RUN mkdir /var/uwsgi/log
 RUN chown www-data:www-data -R /var/uwsgi
 
-WORKDIR /data/$container_name/$project_name
-ADD conf/CocktailManager.ini CocktailManager.ini 
+WORKDIR /data/$project_name
 
-# Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, рестартим nginx и запускаем консоль
-ENTRYPOINT uwsgi --ini CocktailManager.ini &\
+# Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, 
+# рестартим nginx и запускаем консоль
+ENTRYPOINT uwsgi --ini conf/CM-uwsgi.ini &\
 		   curl ${telegram_url} &\
-		   curl -F ${bot_url} -F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" ${telegram_url} &\
+		   curl -F ${bot_url} \
+				-F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
+				${telegram_url} &\
+			sleep 10 &\
 		   service postgresql start &\
+		   sleep 10 &\
 		   service nginx restart &\
-		   clear &\
-		   /bin/bash 
+		   sleep 5 &\
+		   /bin/bash
 
-EXPOSE 443 5432 
+EXPOSE 443 5432
