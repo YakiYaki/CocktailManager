@@ -24,7 +24,6 @@ ENV email brmgeometric@yandex.ru
 # Установка необходимых компонентов
 RUN locale-gen "en_US.UTF-8" &&\
  	update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 &&\
-	
 	apt-get update &&\
 	apt-get install -y postgresql-9.5 \
 	postgresql-server-dev-9.5 \
@@ -38,19 +37,19 @@ RUN locale-gen "en_US.UTF-8" &&\
 	openssl &&\
 	
 	apt-get clean &&\
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* &&\
 
 
-RUN mkdir data
+mkdir data
 WORKDIR /data
 
 # Получаем список необходимых компонентов Python
 COPY conf/requirements.txt requirements.txt
 # Установка необходимых компонентов
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt &&\
 
-# Создаем папку для статики
-RUN mkdir /data/static
+# Создаем папку для статики \
+mkdir /data/static
 # Копируем проект Django
 COPY CocktailManager/ CocktailManager/
 WORKDIR $project_name
@@ -74,19 +73,19 @@ ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi
 # Добавляем настройки uwsgi
 COPY conf/CM-uwsgi.ini conf/CM-uwsgi.ini
 # Добавим данные для сертификата
-RUN echo "${django_allowed_host}\n${email}"
+RUN echo "${django_allowed_host}\n${email}" &&\
 
-# Генерирование сертификата
-RUN cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
-	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem
+# Генерирование сертификата \
+cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
+	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem &&\
 
-# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
-RUN ln -s /data/$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/
+# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его \
+ln -s /data/$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/ &&\
 
-# Настраиваем базу данных PostgreSQL
-RUN echo "local   all             postgres                                md5" >> \
+# Настраиваем базу данных PostgreSQL \
+echo "local   all             postgres                                md5" >> \
 	/etc/postgresql/9.5/main/pg_hba.conf &&\
-	echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
+	echo "hst all  all    0.0.0.o0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
 	echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 
 # Создаем базу данных
@@ -97,12 +96,11 @@ RUN service postgresql start &&\
 # Начальные настройки и связывание с базой данных приложения Django
 USER root:root
 RUN service postgresql start &&\
-	sleep 45 &&\
 	python3 manage.py makemigrations &&\
-	python3 manage.py migrate
+	python3 manage.py migrate &&\
 
-# Собирает статические файлы в STATIC_ROOT приложения Django
-RUN echo yes | python3 manage.py collectstatic
+# Собирает статические файлы в STATIC_ROOT приложения Django \
+echo yes | python3 manage.py collectstatic
 
 # Добавляем наше приложение в автозапуск
 WORKDIR /etc
@@ -110,27 +108,24 @@ RUN rm -f rc.local
 ADD conf/rc.local /etc/rc.local
 
 # Устанавливаем uwsgi глобально
-RUN pip3 install uwsgi
+RUN pip3 install uwsgi &&\
 
-# Создаём директорию для логов uwsgi
-RUN mkdir /var/uwsgi
-RUN mkdir /var/uwsgi/log
-RUN chown www-data:www-data -R /var/uwsgi
+# Создаём директорию для логов uwsgi \
+mkdir /var/uwsgi &&\
+mkdir /var/uwsgi/log &&\
+chown www-data:www-data -R /var/uwsgi
 
 WORKDIR /data/$project_name
 
 # Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, 
 # рестартим nginx и запускаем консоль
-ENTRYPOINT uwsgi --ini conf/CM-uwsgi.ini &\
-		   curl ${telegram_url} &\
+ENTRYPOINT uwsgi --ini conf/CM-uwsgi.ini &&\
+		   curl ${telegram_url} &&\
 		   curl -F ${bot_url} \
 				-F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
-				${telegram_url} &\
-			sleep 10 &\
-		   service postgresql start &\
-		   sleep 10 &\
-		   service nginx restart &\
-		   sleep 5 &\
+				${telegram_url} &&\
+		   service postgresql start &&\
+		   service nginx restart &&\
 		   /bin/bash
 
 EXPOSE 443 5432
