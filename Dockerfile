@@ -68,7 +68,8 @@ COPY conf/CocktailManager-nginx.conf conf/CocktailManager-nginx.conf
 # Создаем базу данных
 USER postgres
 RUN service postgresql start &&\
-	psql -f "conf/db.ini" 
+	echo "CREATE DATABASE ${db_name} OWNER barman;" >> conf/CM-db.ini &&\
+	psql -f "conf/CM-db.ini"
 
 # Начальные настройки и связывание с базой данных приложения Django
 USER root:root
