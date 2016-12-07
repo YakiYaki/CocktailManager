@@ -1,6 +1,6 @@
   # Основные настройки
 FROM ubuntu:16.04
-MAINTAINER Artur Galikhaydarov (brmgeometric@yandex.ru), Nikita Boyarskikh N02@yandex.ru
+MAINTAINER Artur Galikhaydarov (brmgeometric@yandex.ru), Nikita Boyarskikh (N02@yandex.ru)
 
 # Входные параметры
 # ВНИМАНИЕ! При вводе через --build-arg django_secret_key необходимо экранировать 
@@ -46,7 +46,7 @@ WORKDIR /data
 # Получаем список необходимых компонентов Python
 COPY conf/requirements.txt requirements.txt
 # Установка необходимых компонентов
-RUN pip3 install -r requirements.txt &&\
+RUN pip3 install -r requirements.txt > /dev/null &&\
 
 # Создаем папку для статики \
 mkdir /data/static
@@ -73,11 +73,11 @@ ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi
 # Добавляем настройки uwsgi
 COPY conf/CM-uwsgi.ini conf/CM-uwsgi.ini
 # Добавим данные для сертификата
-RUN echo "${django_allowed_host}\n${email}" &&\
+RUN echo "${django_allowed_host}\n${email}" >> ssl/CM-ssl.ini &&\
 
 # Генерирование сертификата \
 cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
-	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem &&\
+	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem > /dev/null &&\
 
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его \
 ln -s /data/$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/ &&\
