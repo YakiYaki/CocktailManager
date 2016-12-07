@@ -85,7 +85,7 @@ ln -s /data/$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/ &&\
 # Настраиваем базу данных PostgreSQL \
 echo "local   all             postgres                                md5" >> \
 	/etc/postgresql/9.5/main/pg_hba.conf &&\
-	echo "hst all  all    0.0.0.o0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
+	echo "host all  all    0.0.0.o0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
 	echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 
 # Создаем базу данных
