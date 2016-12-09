@@ -33,6 +33,8 @@ RUN locale-gen "en_US.UTF-8" &&\
 	python3 \
 	python3.5-dev \
 	python3-pip \
+	libpcre3 \
+	libpcre3-dev \
 	git \
 	curl \
 	openssl &&\
@@ -118,6 +120,8 @@ RUN mkdir /var/uwsgi/log
 RUN chown www-data:www-data -R /var/uwsgi
 
 WORKDIR /data/$project_name
+RUN chmod a+w manager.log 
+
 
 # Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, 
 # рестартим nginx и запускаем консоль
