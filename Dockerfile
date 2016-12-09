@@ -74,7 +74,7 @@ ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi
 # Добавляем настройки uwsgi
 COPY conf/CM-uwsgi.ini conf/CM-uwsgi.ini
 # Добавим данные для сертификата
-RUN echo "${django_allowed_host}\n${email}"
+RUN echo "${django_allowed_host}\n${email}" >> ssl/CM-ssl.ini
 
 # Генерирование сертификата
 RUN cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
@@ -122,7 +122,7 @@ WORKDIR /data/$project_name
 # Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, 
 # рестартим nginx и запускаем консоль
 ENTRYPOINT uwsgi --ini conf/CM-uwsgi.ini &\
-		   curl ${telegram_url} &\
+		   curl ${telegram_url} &&\
 		   curl -F ${bot_url} \
 				-F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
 				${telegram_url} &\
