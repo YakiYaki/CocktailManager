@@ -18,6 +18,7 @@ ENV project_name CocktailManager
 ENV app_name manager
 ENV token bot${bot_token}
 ENV bot_url "url=https://${django_allowed_host}/bot/${bot_token}"
+ENV cert_path "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem"
 ENV telegram_url https://api.telegram.org/${token}/setWebhook
 ENV email brmgeometric@yandex.ru
 
@@ -48,7 +49,7 @@ COPY conf/requirements.txt requirements.txt
 # Установка необходимых компонентов
 RUN pip3 install -r requirements.txt > /dev/null &&\
 
-# Создаем папку для статики \
+# Создаем папку для статики
 mkdir /data/static
 # Копируем проект Django
 COPY CocktailManager/ CocktailManager/
@@ -75,14 +76,14 @@ COPY conf/CM-uwsgi.ini conf/CM-uwsgi.ini
 # Добавим данные для сертификата
 RUN echo "${django_allowed_host}\n${email}" >> ssl/CM-ssl.ini &&\
 
-# Генерирование сертификата \
+# Генерирование сертификата
 cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
 	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem > /dev/null &&\
 
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его \
 ln -s /data/$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/ &&\
 
-# Настраиваем базу данных PostgreSQL \
+# Настраиваем базу данных PostgreSQL
 echo "local   all             postgres                                md5" >> \
 	/etc/postgresql/9.5/main/pg_hba.conf &&\
 	echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
@@ -96,10 +97,11 @@ RUN service postgresql start &&\
 # Начальные настройки и связывание с базой данных приложения Django
 USER root:root
 RUN service postgresql start &&\
+	sleep 45 &&\
 	python3 manage.py makemigrations &&\
 	python3 manage.py migrate &&\
 
-# Собирает статические файлы в STATIC_ROOT приложения Django \
+# Собирает статические файлы в STATIC_ROOT приложения Django
 echo yes | python3 manage.py collectstatic
 
 # Добавляем наше приложение в автозапуск
@@ -110,7 +112,7 @@ ADD conf/rc.local /etc/rc.local
 # Устанавливаем uwsgi глобально
 RUN pip3 install uwsgi &&\
 
-# Создаём директорию для логов uwsgi \
+# Создаём директорию для логов uwsgi
 mkdir /var/uwsgi &&\
 mkdir /var/uwsgi/log &&\
 chown www-data:www-data -R /var/uwsgi
@@ -121,9 +123,7 @@ WORKDIR /data/$project_name
 # рестартим nginx и запускаем консоль
 ENTRYPOINT uwsgi --ini conf/CM-uwsgi.ini &&\
 		   curl ${telegram_url} &&\
-		   curl -F ${bot_url} \
-				-F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
-				${telegram_url} &&\
+		   curl -F ${bot_url} -F ${cert_path} ${telegram_url} &&\
 		   service postgresql start &&\
 		   service nginx restart &&\
 		   /bin/bash

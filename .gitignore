@@ -9,3 +9,5 @@ certificates/
 __pycache__/
 *.pyc
 migrations/
+
+*.info

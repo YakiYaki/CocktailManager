@@ -114,6 +114,40 @@ DATABASES = {
     }
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'applogfile': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'manager.log'),
+            'maxBytes': 1024*1024*15, # 15MB
+            'backupCount': 10,
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers':['applogfile'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'manager': {
+            'handlers': ['applogfile'],
+            'level': 'DEBUG',
+        },
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -127,5 +161,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = '/data/CocktailManager/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
