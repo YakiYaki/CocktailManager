@@ -8,6 +8,7 @@ MAINTAINER Artur Galikhaydarov (brmgeometric@yandex.ru), Nikita Boyarskikh N02@y
 ARG bot_token
 ARG django_allowed_host
 ARG django_secret_key
+ARG django_superuser_pass
 ARG db_name
 ARG db_username
 ARG db_password
@@ -101,7 +102,8 @@ USER root:root
 RUN service postgresql start &&\
 	sleep 45 &&\
 	python3 manage.py makemigrations &&\
-	python3 manage.py migrate
+	python3 manage.py migrate &&\
+	echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '${email}', '${django_superuser_pass}')" | python3 manage.py shell
 
 # Собирает статические файлы в STATIC_ROOT приложения Django
 RUN echo yes | python3 manage.py collectstatic
