@@ -12,7 +12,7 @@ token = str(conf.config_get('main', 'token'))
 
 Bot = telebot.TeleBot(token)
 
-logger = logging.getLogger('t-bot.log')
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 

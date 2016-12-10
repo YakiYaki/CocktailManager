@@ -8,6 +8,7 @@ MAINTAINER Artur Galikhaydarov (brmgeometric@yandex.ru), Nikita Boyarskikh (N02@
 ARG bot_token
 ARG django_allowed_host
 ARG django_secret_key
+ARG django_superuser_pass
 ARG db_name
 ARG db_username
 ARG db_password
@@ -33,6 +34,8 @@ RUN locale-gen "en_US.UTF-8" &&\
 	python3 \
 	python3.5-dev \
 	python3-pip \
+	libpcre3 \
+	libpcre3-dev \
 	git \
 	curl \
 	openssl &&\
@@ -74,13 +77,14 @@ ADD https://raw.githubusercontent.com/nginx/nginx/master/conf/uwsgi_params uwsgi
 # Добавляем настройки uwsgi
 COPY conf/CM-uwsgi.ini conf/CM-uwsgi.ini
 # Добавим данные для сертификата
+
 RUN echo "${django_allowed_host}\n${email}" >> ssl/CM-ssl.ini &&\
 
 # Генерирование сертификата
 cat ssl/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
 	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem > /dev/null &&\
 
-# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его \
+# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
 ln -s /data/$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/ &&\
 
 # Настраиваем базу данных PostgreSQL
@@ -97,9 +101,11 @@ RUN service postgresql start &&\
 # Начальные настройки и связывание с базой данных приложения Django
 USER root:root
 RUN service postgresql start &&\
-	sleep 45 &&\
 	python3 manage.py makemigrations &&\
 	python3 manage.py migrate &&\
+	echo "from django.contrib.auth.models import User; \
+        User.objects.create_superuser('root', '${email}', '${django_superuser_pass}')" | \
+  python3 manage.py shell &&\
 
 # Собирает статические файлы в STATIC_ROOT приложения Django
 echo yes | python3 manage.py collectstatic
@@ -118,12 +124,21 @@ mkdir /var/uwsgi/log &&\
 chown www-data:www-data -R /var/uwsgi
 
 WORKDIR /data/$project_name
+RUN chmod a+w manager.log 
+
 
 # Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, 
 # рестартим nginx и запускаем консоль
 ENTRYPOINT uwsgi --ini conf/CM-uwsgi.ini &&\
 		   curl ${telegram_url} &&\
 		   curl -F ${bot_url} -F ${cert_path} ${telegram_url} &&\
+		   service postgresql start &&\
+		   service nginx restart &&\
+ENTRYPOINT uwsgi --ini conf/CM-uwsgi.ini &&\
+		   curl ${telegram_url} &&\
+		   curl -F ${bot_url} \
+				-F "certificate=@/data/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem" \
+				${telegram_url} &&\
 		   service postgresql start &&\
 		   service nginx restart &&\
 		   /bin/bash
