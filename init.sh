@@ -5,7 +5,7 @@ project_name=CocktailManager
 email=brmgeometric@yandex.ru
 bot_url="url=https://$django_allowed_host/bot/$bot_token"
 cert_path="certificate=@/$root_path/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem"
-telegram_url=https://api.telegram.org/bot$bot_token}/setWebhook
+telegram_url=https://api.telegram.org/bot$bot_token/setWebhook
 
 locale-gen "en_US.UTF-8"
 export LC_ALL=en_US.UTF-8 
@@ -14,6 +14,7 @@ export LANGUAGE=en_US.UTF-8
 # Находимся мы в /CocktailManager
 # Установим PostgreSQL и nginx
 apt-get update
+apt-get -y upgrade
 #apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9.5
 apt-get install -y nginx python3 python3.5-dev python3-pip docker.io
 
@@ -36,8 +37,8 @@ cat conf/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/we
 ln -s conf/CM-nginx.conf /etc/nginx/sites-enabled/
 
 # Настраиваем базу данных PostgreSQL
-echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
-echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
+#echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
+#echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 #echo "local   all             postgres                                md5" >> /etc/postgresql/9.5/main/pg_hba.conf
 
 curl $telegram_url

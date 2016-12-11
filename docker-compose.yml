@@ -21,3 +21,4 @@ services:
         - gunicorn -c CM-gunicorn.conf.py CocktailManager.wsgi:application
         - /bin/bash
       args:
+        
