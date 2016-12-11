@@ -51,7 +51,7 @@ db_password = ${db_password}" > config.ini
 # Установка необходимых компонентов
 RUN pip3 install -r ../requirements.txt
 
-EXPOSE 8000
+EXPOSE 8002
 
 # Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, 
 # рестартим nginx и запускаем консоль

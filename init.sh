@@ -36,9 +36,9 @@ cat conf/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/we
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
 ln -s conf/CM-nginx.conf /etc/nginx/sites-enabled/
 
-echo "Deleting WebHook ---->\n"
+echo -e "\nDeleting WebHook ---->"
 curl $telegram_url
-echo "Setting WebHook ---->\n"
+echo -e "\nSetting WebHook ---->\n"
 curl -F $bot_url -F $cert_path $telegram_url
 
 echo "        bot_token: $bot_token" >> docker-compose.yml

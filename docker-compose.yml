@@ -2,13 +2,10 @@ version: '2'
 services:
   db:
     image: postgres
-    entrypoint: 
-      - service postgresql start
-      - sleep 45
-      - sudo -u psql -f "conf/CM-db.ini"
   web:
     ports:
        - "8000:8000"
+       - "8002:8002"
     depends_on:
       - db
     build:
