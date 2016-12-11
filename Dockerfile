@@ -24,7 +24,7 @@ RUN locale-gen "en_US.UTF-8" &&\
  	update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
 RUN apt-get update &&\
-	apt-get install -y python3 python3.5-dev python3-pip git curl openssl &&\
+	apt-get install -y python3 python3.5-dev python3-pip libpq-dev git curl openssl &&\
 	apt-get clean &&\
 	rm -rf /var/lib/apt/lists/*
 

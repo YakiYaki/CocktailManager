@@ -52,4 +52,7 @@ echo "        db_name: $5" >> docker-compose.yml
 echo "        db_username: $6" >> docker-compose.yml
 echo "        db_password: $7" >> docker-compose.yml
 
+echo "\n"
+cat docker-compose.yml
+
 exit 0
