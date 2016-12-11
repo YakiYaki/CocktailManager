@@ -29,14 +29,10 @@ ln -s /$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/
 # Настраиваем базу данных PostgreSQL
 echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
 echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
+echo "local   all             postgres                                md5" >> /etc/postgresql/9.5/main/pg_hba.conf
 
 psql -U postgres -f "conf/CM-db.ini"
 
-docker build --build-arg bot_token=$1 --build-arg django_allowed_host=$2 --build-arg django_secret_key="$3" \
-			 --build-arg django_superuser_pass=$4 \
-			 --build-arg db_name=$5 \
-			 --build-arg db_username=$6 \
-			 --build-arg db_password=$7 \
+docker build --build-arg bot_token=$1 --build-arg django_allowed_host=$2 --build-arg django_secret_key="$3" --build-arg django_superuser_pass=$4 --build-arg db_name=$5 --build-arg db_username=$6 --build-arg db_password=$7 -t prod_test .
 
-			 -t prod_test .
 exit 0
