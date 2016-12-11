@@ -36,12 +36,9 @@ cat conf/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/we
 # В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
 ln -s conf/CM-nginx.conf /etc/nginx/sites-enabled/
 
-# Настраиваем базу данных PostgreSQL
-#echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
-#echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
-#echo "local   all             postgres                                md5" >> /etc/postgresql/9.5/main/pg_hba.conf
-
+echo "Deleting WebHook ---->\n"
 curl $telegram_url
+echo "Setting WebHook ---->\n"
 curl -F $bot_url -F $cert_path $telegram_url
 
 echo "        bot_token: $bot_token" >> docker-compose.yml
@@ -51,8 +48,5 @@ echo "        django_superuser_pass: $4" >> docker-compose.yml
 echo "        db_name: $5" >> docker-compose.yml
 echo "        db_username: $6" >> docker-compose.yml
 echo "        db_password: $7" >> docker-compose.yml
-
-echo "\n"
-cat docker-compose.yml
 
 exit 0
