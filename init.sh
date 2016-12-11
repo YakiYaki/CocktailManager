@@ -15,7 +15,9 @@ apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9
 systemctl enable docker
 systemctl start docker
 
-echo "$django_allowed_host\n$email" >> conf/CM-ssl.ini
+echo "$django_allowed_host" >> conf/CM-ssl.ini 
+echo "$email" >> conf/CM-ssl.ini
+
 mkdir ssl
 # Генерация сертификатов
 cat conf/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
@@ -28,12 +30,9 @@ ln -s /$project_name/conf/CM-nginx.conf /etc/nginx/sites-enabled/
 echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
 echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 
-sudo su - postgres
-psql -f "conf/CM-db.ini"
+psql -U postgres -f "conf/CM-db.ini"
 
-docker build --build-arg bot_token=$1 \
-			 --build-arg django_allowed_host=$2 \
-			 --build-arg django_secret_key="$3" \
+docker build --build-arg bot_token=$1 --build-arg django_allowed_host=$2 --build-arg django_secret_key="$3" \
 			 --build-arg django_superuser_pass=$4 \
 			 --build-arg db_name=$5 \
 			 --build-arg db_username=$6 \
