@@ -17,7 +17,7 @@ ARG db_password
 # Имя директории контейнера, имя директории проекта (имя проекта Django), имя приложения Django
 ENV root_path app
 ENV project_name CocktailManager
-ENV email brmgeometric@yandex.ru
+ENV email=brmgeometric@yandex.ru
 
 # Установка необходимых компонентов
 RUN locale-gen "en_US.UTF-8" &&\
@@ -47,8 +47,10 @@ RUN echo "[main]\n token = ${bot_token}\n[django]\n allowed_host = ${django_allo
 secret_key = ${django_secret_key}\n[DB]\n db_name = ${db_name}\n db_username = ${db_username}\n \
 db_password = ${db_password}" > config.ini
 
+RUN cat config.ini
+
 # Установка необходимых компонентов
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r ../requirements.txt
 
 RUN chmod a+w log/manager.log 
 
