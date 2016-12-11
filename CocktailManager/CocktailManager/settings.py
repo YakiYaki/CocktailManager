@@ -105,11 +105,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': conf.config_get('DB', 'db_name'),
         'USER': conf.config_get('DB', 'db_username'),
         'PASSWORD': conf.config_get('DB', 'db_password'),
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -130,7 +130,7 @@ LOGGING = {
         'applogfile': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'manager.log'),
+            'filename': '/app/log/manager.log',
             'maxBytes': 1024*1024*15, # 15MB
             'backupCount': 10,
         },
@@ -161,5 +161,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = '/data/CocktailManager/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 

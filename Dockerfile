@@ -17,30 +17,25 @@ ARG db_password
 # Имя директории контейнера, имя директории проекта (имя проекта Django), имя приложения Django
 ENV root_path app
 ENV project_name CocktailManager
-ENV bot_url "url=https://$django_allowed_host/bot/$bot_token"
-ENV cert_path "certificate=@/$root_path/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem"
-ENV telegram_url https://api.telegram.org/bot${bot_token}/setWebhook
 ENV email brmgeometric@yandex.ru
 
 # Установка необходимых компонентов
 RUN locale-gen "en_US.UTF-8" &&\
- 	update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 &&\
-	
-	apt-get update &&\
+ 	update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
+RUN apt-get update &&\
 	apt-get install -y python3 python3.5-dev python3-pip git curl openssl &&\
 	apt-get clean &&\
 	rm -rf /var/lib/apt/lists/*
 
-
 RUN mkdir $root_path
 WORKDIR /$root_path
+RUN mkdir log
 
 # Добавляем сертификат
 COPY ssl/webhook_selfsigned_cert.pem ssl/webhook_selfsigned_cert.pem
 # Получаем список необходимых компонентов Python
 COPY conf/requirements.txt requirements.txt
-# Установка необходимых компонентов
-RUN pip3 install -r requirements.txt
 # Добавляем настройки uwsgi
 COPY conf/CM-gunicorn.conf.py conf/CM-gunicorn.conf.py
 # Копируем проект Django
@@ -52,11 +47,10 @@ RUN echo "[main]\n token = ${bot_token}\n[django]\n allowed_host = ${django_allo
 secret_key = ${django_secret_key}\n[DB]\n db_name = ${db_name}\n db_username = ${db_username}\n \
 db_password = ${db_password}" > config.ini
 
-# Раскомментируйте, чтобы просмотреть созданый файл
-# RUN cat config.ini
+# Установка необходимых компонентов
+RUN pip3 install -r requirements.txt
 
-WORKDIR /$root_path/$project_name
-RUN chmod a+w manager.log 
+RUN chmod a+w log/manager.log 
 
 EXPOSE 8000 5432
 
@@ -66,7 +60,5 @@ ENTRYPOINT python3 manage.py makemigrations &&\
 		   python3 manage.py migrate &&\
 		   echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '${email}', '${django_superuser_pass}')" | python3 manage.py shell &&\
 		   echo yes | python3 manage.py collectstatic &&\
-		   curl ${telegram_url} &&\
-		   curl -F ${bot_url} -F ${cert_path} ${telegram_url} &&\
 		   gunicorn -c CM-gunicorn.conf.py CocktailManager.wsgi:application &&\
 		   /bin/bash
