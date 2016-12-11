@@ -109,7 +109,7 @@ DATABASES = {
         'NAME': 'postgres', #conf.config_get('DB', 'db_name'),
         'USER': 'postgres', #conf.config_get('DB', 'db_username'),
         #'PASSWORD': conf.config_get('DB', 'db_password'),
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

@@ -11,14 +11,13 @@ services:
        - "8000:8000"
     depends_on:
       - db
+    entrypoint:
+      - python3 manage.py makemigrations
+      - python3 manage.py migrate
+      - echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '${email}', '${django_superuser_pass}')" | python3 manage.py shell
+      - echo yes | python3 manage.py collectstatic
+      - gunicorn -c CM-gunicorn.conf.py CocktailManager.wsgi:application
+      - /bin/bash
     build:
       context: .
-      entrypoint:
-        - python3 manage.py makemigrations
-        - python3 manage.py migrate
-        - echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '${email}', '${django_superuser_pass}')" | python3 manage.py shell
-        - echo yes | python3 manage.py collectstatic
-        - gunicorn -c CM-gunicorn.conf.py CocktailManager.wsgi:application
-        - /bin/bash
       args:
-        

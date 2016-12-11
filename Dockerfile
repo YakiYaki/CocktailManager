@@ -52,7 +52,7 @@ RUN pip3 install -r requirements.txt
 
 RUN chmod a+w log/manager.log 
 
-EXPOSE 8000 5432
+EXPOSE 8000
 
 # Запускаем наш сервер, сброс WebHook, установливаем WebHook, запускаем сервер базы данных, 
 # рестартим nginx и запускаем консоль
