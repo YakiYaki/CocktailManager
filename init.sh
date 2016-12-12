@@ -8,10 +8,11 @@ db_name=$5
 db_username=$6
 db_password=$7
 
+root_path=app
 project_name=CocktailManager
 email=brmgeometric@yandex.ru
 bot_url="url=https://$django_allowed_host/bot/$bot_token"
-cert_path="certificate=@/$root_path/$container_name/$project_name/ssl/webhook_selfsigned_cert.pem"
+cert_path="certificate=@/$root_path/ssl/webhook_selfsigned_cert.pem"
 telegram_url=https://api.telegram.org/bot$bot_token/setWebhook
 
 locale-gen "en_US.UTF-8"
@@ -34,10 +35,10 @@ apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9
 #docker-compose --version
 
 cd /
-mkdir app
-cd app
-mv /CocktailManager/CocktailManager .
-mv /CocktailManager/conf .
+mkdir $root_path
+cd $root_path
+mv /$project_name/$project_name .
+mv /$project_name/conf .
 mkdir ssl
 
 # Добавим необходимые данные для сертификата
@@ -68,8 +69,8 @@ pip3 install -r conf/requirements.txt
 #echo "        db_password: $7" >> docker-compose.yml
 
 # Настройка и создание базы данных
-echo "local   all             postgres                                md5" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
-echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf &&\
+echo "local   all             postgres                                md5" >> /etc/postgresql/9.5/main/pg_hba.conf
+echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
 echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 sudo -u postgres psql -f "conf/CM-db.ini"
 
@@ -78,8 +79,8 @@ mkdir media
 mkdir static
 
 # Создаем из входных данных файл конфигурации
-echo -e "[main]\ntoken = $bot_token\n[django]\nallowed_host = $django_allowed_host\n" > config.ini
-echo -e "secret_key = $django_secret_key\n[DB]\ndb_name = $db_name\ndb_username = $db_username\n" >> config.ini
+echo -e "[main]\ntoken = $bot_token\n[django]\nallowed_host = $django_allowed_host" > config.ini
+echo -e "secret_key = $django_secret_key\n[DB]\ndb_name = $db_name\ndb_username = $db_username" >> config.ini
 echo -e "db_password = $db_password" >> config.ini
 cat config.ini
 
@@ -93,7 +94,7 @@ echo yes | python3 manage.py collectstatic
 
 service nginx restart
 # Запускаем Gunicorn
-gunicorn -c CM-gunicorn.conf.py CocktailManager.wsgi:application
+gunicorn -c ../conf/CM-gunicorn.conf.py CocktailManager.wsgi:application
 
 echo -e "\n [DONE]"
 

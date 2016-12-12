@@ -130,7 +130,7 @@ LOGGING = {
         'applogfile': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': '/app/log/manager.log',
+            'filename': os.path.join(BASE_DIR, 'manager.log'),
             'maxBytes': 1024*1024*15, # 15MB
             'backupCount': 10,
         },
