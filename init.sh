@@ -75,6 +75,12 @@ echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
 echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
 sudo -u postgres psql -f "conf/CM-db.ini"
 
+mkdir log
+touch log/gunicorn-error.log
+touch log/gunicorn-access.log
+chmod a+x log/gunicorn-error.log
+chmod a+x log/gunicorn-access.log
+
 cd $project_name
 mkdir media
 mkdir static
