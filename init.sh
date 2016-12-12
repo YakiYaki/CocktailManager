@@ -84,17 +84,6 @@ chmod a+w manager.log
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')" | python3 manage.py shell
 echo yes | python3 manage.py collectstatic
 
-
-rm /etc/nginx/sites-available/default
-rm /etc/nginx/sites-enable/default
-# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
-ln -s /app/conf/CM-nginx1.conf /etc/nginx/sites-enabled/
-
-nginx -s reload
-# Запускаем Gunicorn
-gunicorn -c ../conf/CM-gunicorn.conf.py -D CocktailManager.wsgi:application
-#uwsgi --ini ../conf/CM-uwsgi.ini
-
 echo -e "\n [DONE]"
 
 exit 0
