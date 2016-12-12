@@ -53,5 +53,5 @@ class BotView(View):
 		return JsonResponse({}, status=200)
 
 	@method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(BotView, self).dispatch(request, *args, **kwargs)
+	def dispatch(self, request, *args, **kwargs):
+		return super(BotView, self).dispatch(request, *args, **kwargs)
