@@ -6,7 +6,7 @@ After=network.target
 User=www-data
 Group=www-data
 WorkingDirectory=/app/CocktailManager
-ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/app/CocktailManager/ cocktail.sock CocktailManager.wsgi:application
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/app/CocktailManager/cocktail.sock CocktailManager.wsgi:application
 
 [Install]
 WantedBy=multi-user.target

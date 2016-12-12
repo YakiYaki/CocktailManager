@@ -91,9 +91,10 @@ echo yes | python3 manage.py collectstatic
 
 cd /$root_path
 chown -R www-data:www-data *
-chmod g+x -R *
+chmod g+rxw -R *
 
-unlink /etc/nginx/sites-enable/default
+cd /etc/nginx/sites-enable
+unlink default
 rm /etc/nginx/sites-available/default
 ln -s /app/conf/CM-nginx1.conf /etc/nginx/sites-enabled/
 
