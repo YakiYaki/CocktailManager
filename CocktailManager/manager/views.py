@@ -12,7 +12,7 @@ token = str(conf.config_get('main', 'token'))
 
 Bot = telebot.TeleBot(token)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('manager.log')
 
 # Create your views here.
 
@@ -28,6 +28,7 @@ class IndexView(TemplateView):
 class BotView(TemplateView):
 	def post(self, request, in_token):
 		if in_token != token:
+			logger.error("Invalid token!")
 			return HttpResponseForbidden('Invalid token!')
 
 		raw = request.body.decode('utf-8')

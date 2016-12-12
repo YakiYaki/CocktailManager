@@ -94,9 +94,10 @@ cat config.ini
 # Настраиваем приложение и создаем суперпользователя
 python3 manage.py makemigrations
 python3 manage.py migrate
-chmod a+w log/manager.log
-echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')"
+chmod a+w manager.log
+
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')" | python3 manage.py shell
+
 echo yes | python3 manage.py collectstatic
 
 service nginx restart
