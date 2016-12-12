@@ -1,0 +1,12 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/app/CocktailManager
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/app/CocktailManager/ cocktail.sock CocktailManager.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
