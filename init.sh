@@ -92,11 +92,8 @@ ln -s /app/conf/CM-nginx1.conf /etc/nginx/sites-enabled/
 
 nginx -s reload
 # Запускаем Gunicorn
-#gunicorn -c ../conf/CM-gunicorn.conf.py -D CocktailManager.wsgi:application
+gunicorn -c ../conf/CM-gunicorn.conf.py -D CocktailManager.wsgi:application
 #uwsgi --ini ../conf/CM-uwsgi.ini
-
-#rm -rf /CocktailManager
-supervisord
 
 echo -e "\n [DONE]"
 

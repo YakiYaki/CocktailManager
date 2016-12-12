@@ -3,4 +3,3 @@ gunicorn==19.6
 uwsgi==2.0.14
 pytelegrambotapi==2.2.3
 psycopg2==2.6.2
-supervisor
