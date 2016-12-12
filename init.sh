@@ -56,6 +56,7 @@ echo -e "\nDeleting WebHook ---->"
 curl $telegram_url
 echo -e "\nSetting WebHook ---->"
 curl -F $bot_url -F $cert_path $telegram_url
+echo ""
 
 # Устанавливаем необходимые компоненты
 pip3 install -r conf/requirements.txt
