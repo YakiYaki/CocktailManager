@@ -11,7 +11,7 @@ db_password=$7
 root_path=app
 project_name=CocktailManager
 email=brmgeometric@yandex.ru
-bot_url="url=https://$django_allowed_host/bot/$bot_token"
+bot_url="url=https://$django_allowed_host/bar/bot/$bot_token"
 cert_path="certificate=@/$root_path/ssl/webhook_selfsigned_cert.pem"
 telegram_url=https://api.telegram.org/bot$bot_token/setWebhook
 
