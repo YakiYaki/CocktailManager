@@ -24,15 +24,7 @@ export LANGUAGE=en_US.UTF-8
 apt-get update
 apt-get -y upgrade
 apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9.5 nginx \
-					python3 python3.5-dev python3-pip libpq-dev libpcre3 libpcre3-dev #\
-#					docker.io
-
-#systemctl enable docker
-#systemctl start docker
-
-#curl -L "https://github.com/docker/compose/releases/download/1.9.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-#chmod +x /usr/local/bin/docker-compose
-#docker-compose --version
+					python3 python3.5-dev python3-pip libpq-dev libpcre3 libpcre3-dev
 
 cd /
 mkdir $root_path
@@ -48,9 +40,6 @@ echo "$email" >> conf/CM-ssl.ini
 cat conf/CM-ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_selfsigned_cert.key \
 	-x509 -days 3650 -out ssl/webhook_selfsigned_cert.pem
 
-# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
-ln -s conf/CM-nginx.conf /etc/nginx/sites-enabled/
-
 # Устанавливаем связь с Telegram
 echo -e "\nDeleting WebHook ---->"
 curl $telegram_url
@@ -61,14 +50,6 @@ echo ""
 # Устанавливаем необходимые компоненты
 pip3 install -r conf/requirements.txt
 
-#echo "        bot_token: $bot_token" >> docker-compose.yml
-#echo "        django_allowed_host: $django_allowed_host" >> docker-compose.yml
-#echo "        django_secret_key: \"$3\"" >> docker-compose.yml
-#echo "        django_superuser_pass: $4" >> docker-compose.yml
-#echo "        db_name: $5" >> docker-compose.yml
-#echo "        db_username: $6" >> docker-compose.yml
-#echo "        db_password: $7" >> docker-compose.yml
-
 # Настройка и создание базы данных
 echo "local   all             postgres                                md5" >> /etc/postgresql/9.5/main/pg_hba.conf
 echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
@@ -78,8 +59,8 @@ sudo -u postgres psql -f "conf/CM-db.ini"
 mkdir log
 touch log/gunicorn-error.log
 touch log/gunicorn-access.log
-chmod a+x log/gunicorn-error.log
-chmod a+x log/gunicorn-access.log
+chmod a+w log/gunicorn-error.log
+chmod a+w log/gunicorn-access.log
 
 cd $project_name
 mkdir media
@@ -96,20 +77,26 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 chmod a+w manager.log
 
-mkdir /var/uwsgi
-mkdir /var/uwsgi/log
-chown www-data:www-data -R /var/uwsgi
+#mkdir /var/uwsgi
+#mkdir /var/uwsgi/log
+#chown www-data:www-data -R /var/uwsgi
 
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')" | python3 manage.py shell
-
 echo yes | python3 manage.py collectstatic
 
-service nginx restart
+
+rm /etc/nginx/sites-available/default
+rm /etc/nginx/sites-enable/default
+# В папке /etc/nginx/sites-enabled создаем ссылку на файл CM-nginx.conf, чтобы nginx увидел его
+ln -s /app/conf/CM-nginx1.conf /etc/nginx/sites-enabled/
+
+nginx -s reload
 # Запускаем Gunicorn
 #gunicorn -c ../conf/CM-gunicorn.conf.py -D CocktailManager.wsgi:application
-uwsgi --ini ../conf/CM-uwsgi.ini
+#uwsgi --ini ../conf/CM-uwsgi.ini
 
 #rm -rf /CocktailManager
+supervisord
 
 echo -e "\n [DONE]"
 

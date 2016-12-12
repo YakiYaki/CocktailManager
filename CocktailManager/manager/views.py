@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView
+from django.views.generic import View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 from config import Configuration
 import json
@@ -25,8 +28,11 @@ class IndexView(TemplateView):
 		return context
 
 # bot body
-class BotView(TemplateView):
+class BotView(View):
 	def post(self, request, in_token):
+		
+		logger.info("HEREEEEEEEEEEEEEEEEEEEEE!")
+
 		if in_token != token:
 			logger.error("Invalid token!")
 			return HttpResponseForbidden('Invalid token!')
@@ -37,6 +43,7 @@ class BotView(TemplateView):
 		try:
 			payload = json.loads(raw)
 		except ValueError:
+			logger.info("Invalid request body!")
 			return HttpResponseBadRequest('Invalid request body')
 		else:
 			chat_id = payload['message']['chat']['id']
@@ -44,3 +51,7 @@ class BotView(TemplateView):
 			Bot.sendMessage(chat_id, text)
 
 		return JsonResponse({}, status=200)
+
+	@method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(BotView, self).dispatch(request, *args, **kwargs)
