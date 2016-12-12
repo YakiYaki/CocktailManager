@@ -27,6 +27,15 @@ class IndexView(TemplateView):
 		context = super(IndexView, self).get_context_data(**kwargs)
 		return context
 
+def bot_test(request, bot_token):
+	if request.method == 'POST':
+		logger.info("GET POST request")
+		return JsonResponse({}, status=200)
+	else:
+		logger.info("GET NO POST request")
+		return HttpResponseBadRequest('Invalid request body')
+
+
 # bot body
 class BotView(View):
 	def post(self, request):
