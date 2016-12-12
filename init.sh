@@ -26,9 +26,6 @@ apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9
 					python3 python3.5-dev python3-pip libpq-dev #\
 #					docker.io
 
-# Устанавливаем необходимые компоненты
-pip3 install -r ../requirements.txt
-
 #systemctl enable docker
 #systemctl start docker
 
@@ -58,6 +55,9 @@ echo -e "\nDeleting WebHook ---->"
 curl $telegram_url
 echo -e "\nSetting WebHook ---->"
 curl -F $bot_url -F $cert_path $telegram_url
+
+# Устанавливаем необходимые компоненты
+pip3 install -r conf/requirements.txt
 
 #echo "        bot_token: $bot_token" >> docker-compose.yml
 #echo "        django_allowed_host: $django_allowed_host" >> docker-compose.yml
