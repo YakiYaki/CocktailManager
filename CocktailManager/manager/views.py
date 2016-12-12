@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.views.generic.base import TemplateView
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt

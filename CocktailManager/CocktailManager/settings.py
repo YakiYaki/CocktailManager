@@ -116,7 +116,12 @@ DATABASES = {
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
     'formatters': {
         'verbose': {
             'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
@@ -127,19 +132,25 @@ LOGGING = {
         },
     },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        },        
         'applogfile': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'manager.log'),
-            'maxBytes': 1024*1024*15, # 15MB
-            'backupCount': 10,
+            'encoding': 'utf-8',
+            'maxBytes': 1024*1024*50, # 15MB
+            'backupCount': 50,
         },
     },
     'loggers': {
-        'django': {
-            'handlers':['applogfile'],
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
             'propagate': True,
-            'level':'DEBUG',
         },
         'manager': {
             'handlers': ['applogfile'],
