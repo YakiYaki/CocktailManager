@@ -26,6 +26,9 @@ apt-get -y upgrade
 apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9.5 nginx \
 					python3 python3.5-dev python3-pip libpq-dev libpcre3 libpcre3-dev
 
+
+gpasswd -a root www-data
+
 cd /
 mkdir $root_path
 cd $root_path
@@ -62,6 +65,8 @@ touch log/gunicorn-access.log
 chmod a+w log/gunicorn-error.log
 chmod a+w log/gunicorn-access.log
 
+mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
+
 cd $project_name
 mkdir media
 mkdir static
@@ -83,6 +88,14 @@ chmod a+w manager.log
 
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')" | python3 manage.py shell
 echo yes | python3 manage.py collectstatic
+
+cd /$root_path
+chown -R www-data:www-data *
+chmod g+x -R *
+
+unlink /etc/nginx/sites-enable/default
+rm /etc/nginx/sites-available/default
+ln -s /app/conf/CM-nginx1.conf /etc/nginx/sites-enabled/
 
 echo -e "\n [DONE]"
 
