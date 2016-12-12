@@ -24,7 +24,7 @@ export LANGUAGE=en_US.UTF-8
 apt-get update
 apt-get -y upgrade
 apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9.5 nginx \
-					python3 python3.5-dev python3-pip libpq-dev #\
+					python3 python3.5-dev python3-pip libpq-dev libpcre3 libpcre3-dev #\
 #					docker.io
 
 #systemctl enable docker
@@ -96,13 +96,20 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 chmod a+w manager.log
 
+mkdir /var/uwsgi
+mkdir /var/uwsgi/log
+chown www-data:www-data -R /var/uwsgi
+
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')" | python3 manage.py shell
 
 echo yes | python3 manage.py collectstatic
 
 service nginx restart
 # Запускаем Gunicorn
-gunicorn -c ../conf/CM-gunicorn.conf.py CocktailManager.wsgi:application
+#gunicorn -c ../conf/CM-gunicorn.conf.py -D CocktailManager.wsgi:application
+uwsgi --ini ../conf/CM-uwsgi.ini
+
+#rm -rf /CocktailManager
 
 echo -e "\n [DONE]"
 
