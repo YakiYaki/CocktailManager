@@ -26,6 +26,9 @@ apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9
 					python3 python3.5-dev python3-pip libpq-dev #\
 #					docker.io
 
+# Устанавливаем необходимые компоненты
+pip3 install -r ../requirements.txt
+
 #systemctl enable docker
 #systemctl start docker
 
@@ -84,7 +87,8 @@ cat config.ini
 python3 manage.py makemigrations
 python3 manage.py migrate
 chmod a+w log/manager.log
-echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '${email}', '${django_superuser_pass}')" | python3 manage.py shell
+echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')"
+echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', '$email', '$django_superuser_pass')" | python3 manage.py shell
 echo yes | python3 manage.py collectstatic
 
 service nginx restart
