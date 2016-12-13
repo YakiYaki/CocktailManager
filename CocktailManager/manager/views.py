@@ -38,13 +38,12 @@ def bot_test(request, bot_token):
 
 # bot body
 class BotView(View):
-	def post(self, request):
-		
+	def post(self, request, bot_token):		
 		logger.info("HEREEEEEEEEEEEEEEEEEEEEE!")
 
-		#if in_token != token:
-		#	logger.error("Invalid token!")
-		#	return HttpResponseForbidden('Invalid token!')
+		if bot_token != token:
+			logger.error("Invalid token!")
+			return HttpResponseForbidden('Invalid token!')
 
 		raw = request.body.decode('utf-8')
 		logger.info(raw)
