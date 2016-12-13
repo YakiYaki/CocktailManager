@@ -6,7 +6,7 @@ After=network.target
 User=www-data
 Group=www-data
 WorkingDirectory=/app/CocktailManager
-ExecStart=/usr/local/bin/gunicorn --workers 3 --bind 127.0.0.1:8001 --access-logfile /app/log/gunicorn-access.log --log-file /app/log/gunicorn-error.log --log-level debug --max-requests=1024 CocktailManager.wsgi:application
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind 46.101.126.140:443 --access-logfile /app/log/gunicorn-access.log --log-file /app/log/gunicorn-error.log --log-level debug --max-requests=1024 --certfile=/app/CocktailManager/ssl/webhook_selfsigned_cert.pem --keyfile=/app/CocktailManager/ssl/webhook_selfsigned_cert.key CocktailManager.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
