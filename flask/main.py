@@ -1,17 +1,18 @@
 from flask import Flask, request
+import telebot
+import json
+
 from config import Configuration
 conf = Configuration()
 
-import telegram
-
 # CONFIG
 TOKEN    = conf.config_get('main', 'token')
-HOST     = conf.config_get('main', 'host') # Same FQDN used when generating SSL Cert
-PORT     = conf.config_get('main', 'port')
+HOST     = conf.config_get('main', 'host')
+PORT     = int(conf.config_get('main', 'port'))
 CERT     = '/app/ssl/webhook_selfsigned_cert.pem'
 CERT_KEY = '/app/ssl/webhook_selfsigned_cert.key'
 
-bot = telegram.Bot(TOKEN)
+bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 context = (CERT, CERT_KEY)
 
@@ -21,19 +22,14 @@ def hello():
 
 @app.route('/bot/' + TOKEN, methods=['POST'])
 def webhook():
-    update = telegram.update.Update.de_json(request.get_json(force=True))
-    bot.sendMessage(chat_id=update.message.chat_id, text='Hello, there')
+    payload = json.loads(request.data.decode('utf-8'))
+    chat_id = payload['message']['chat']['id']
+    text = payload['message'].get('text')
+    bot.send_message(chat_id, text)
 
     return 'OK'
 
-
-#def setWebhook():
-    #bot.setWebhook(webhook_url='https://%s:%s/%s' % (HOST, PORT, TOKEN),
-    #               certificate=open(CERT, 'rb'))
-
 if __name__ == '__main__':
-#    setWebhook()
-
     app.run(host='0.0.0.0',
             port=PORT,
             ssl_context=context,
