@@ -43,11 +43,12 @@ chmod a+w log/gerror.log
 chmod a+w log/gaccess.log
 mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
 
-cd /etc/nginx/sites-enabled
-unlink default
+# nginx
+# Удаляем настройки по умолчанию и устанавливаем новые
+unlink /etc/nginx/sites-enabled/default
 rm /etc/nginx/sites-available/default
 ln -s conf/nginx.conf /etc/nginx/sites-enabled/
-
+# Тестируем конфигурацию
 nginx -t
 
 # Создаем из входных данных файл конфигурации
