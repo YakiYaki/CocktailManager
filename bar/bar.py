@@ -9,8 +9,8 @@ conf = Configuration()
 TOKEN    = conf.config_get('main', 'token')
 HOST     = conf.config_get('main', 'host')
 PORT     = int(conf.config_get('main', 'port'))
-CERT     = '/app/ssl/webhook_selfsigned_cert.pem'
-CERT_KEY = '/app/ssl/webhook_selfsigned_cert.key'
+CERT     = '/app/bar/ssl/webhook_cert.pem'
+CERT_KEY = '/app/bar/ssl/webhook_cert.key'
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
