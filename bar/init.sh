@@ -35,6 +35,8 @@ cd $project_name
 mv /$rep_name/conf .
 mkdir ssl
 mkdir log
+mkdir static
+mkdir media
 touch log/gerror.log
 touch log/gaccess.log
 chmod a+w log/gerror.log
