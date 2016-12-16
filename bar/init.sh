@@ -47,7 +47,7 @@ mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
 # Удаляем настройки по умолчанию и устанавливаем новые
 unlink /etc/nginx/sites-enabled/default
 rm /etc/nginx/sites-available/default
-ln -s conf/nginx.conf /etc/nginx/sites-enabled/
+ln -s /$root_path/$project_name/conf/nginx.conf /etc/nginx/sites-enabled/
 # Тестируем конфигурацию
 nginx -t
 
@@ -69,6 +69,6 @@ echo -e "\nSetting WebHook ---->"
 curl -F $bot_url -F $cert_path $telegram_url
 echo ""
 
-chown -R www-data:www-data *
+chown -R www-data:www-data /$root_path
 
 exit 0
