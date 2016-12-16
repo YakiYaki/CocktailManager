@@ -11,7 +11,7 @@ email=brmgeometric@yandex.ru
 
 path=bot/$bot_token
 bot_url="url=https://$host:$port/$path"
-cert_path="certificate=@/$root_path/$project_name/ssl/webhook_selfsigned_cert.pem"
+cert_path="certificate=@/$root_path/$project_name/ssl/webhook_cert.pem"
 telegram_url=https://api.telegram.org/bot$bot_token/setWebhook
 
 locale-gen "en_US.UTF-8"
@@ -22,9 +22,9 @@ apt-get update
 apt-get -y upgrade
 apt-get install -y python3 python3.5-dev python3-pip libpq-dev    libpcre3 libpcre3-dev
 
-# Находимся мы в CoctailManager (репозиторий)
+# Находимся мы в CoctailManager/bar (репозиторий)
 # Устанавливаем необходимые компоненты
-pip3 install -r conf/requirements.txt
+pip3 install -r ../conf/requirements.txt
 
 cd /
 mkdir $root_path

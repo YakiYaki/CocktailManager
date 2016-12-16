@@ -6,7 +6,7 @@ After=network.target
 User=www-data
 Group=www-data
 WorkingDirectory=/app/bar
-ExecStart=/usr/local/bin/gunicorn --workers 3 --bind 46.101.126.140:8443 --access-logfile=/app/bar/log/gaccess.log --log-file=/app/bar/log/gerror.log --log-level=debug --max-requests=1024 --certfile=/app/bar/ssl/webhook_cert.pem --keyfile=/app/bar/ssl/webhook_cert.key wsgi:app
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind 46.101.126.140:8443 --proxy-allow-from "*" --forwarded-allow-ips "*" --access-logfile=/app/bar/log/gaccess.log --log-file=/app/bar/log/gerror.log --log-level=debug --max-requests=1024 --certfile=/app/bar/ssl/webhook_cert.pem --keyfile=/app/bar/ssl/webhook_cert.key uwsgi:app
 
 [Install]
 WantedBy=multi-user.target
