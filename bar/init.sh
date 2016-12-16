@@ -43,14 +43,6 @@ chmod a+w log/gerror.log
 chmod a+w log/gaccess.log
 mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
 
-# nginx
-# Удаляем настройки по умолчанию и устанавливаем новые
-unlink /etc/nginx/sites-enabled/default
-rm /etc/nginx/sites-available/default
-ln -s /$root_path/$project_name/conf/nginx.conf /etc/nginx/sites-enabled/
-# Тестируем конфигурацию
-nginx -t
-
 # Создаем из входных данных файл конфигурации
 echo -e "[main]\ntoken = $bot_token\nhost = $host\nport = $port" > config.ini
 #cat config.ini
@@ -61,6 +53,15 @@ echo "$email" >> conf/ssl.ini
 # Генерация сертификатов
 cat conf/ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_cert.key \
 	-x509 -days 3650 -out ssl/webhook_cert.pem
+
+
+# nginx
+# Удаляем настройки по умолчанию и устанавливаем новые
+unlink /etc/nginx/sites-enabled/default
+rm /etc/nginx/sites-available/default
+ln -s /$root_path/$project_name/conf/nginx.conf /etc/nginx/sites-enabled/
+# Тестируем конфигурацию
+nginx -t
 
 # Устанавливаем связь с Telegram
 echo -e "\nDeleting WebHook ---->"
