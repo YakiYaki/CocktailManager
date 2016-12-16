@@ -20,7 +20,7 @@ export LANGUAGE=en_US.UTF-8
 
 apt-get update
 apt-get -y upgrade
-apt-get install -y python3 python3.5-dev python3-pip libpq-dev    libpcre3 libpcre3-dev
+apt-get install -y python3 python3.5-dev python3-pip libpq-dev nginx  libpcre3 libpcre3-dev
 
 # Находимся мы в CoctailManager/bar (репозиторий)
 # Устанавливаем необходимые компоненты
@@ -42,6 +42,13 @@ touch log/gaccess.log
 chmod a+w log/gerror.log
 chmod a+w log/gaccess.log
 mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
+
+cd /etc/nginx/sites-enabled
+unlink default
+rm /etc/nginx/sites-available/default
+ln -s conf/nginx.conf /etc/nginx/sites-enabled/
+
+nginx -t
 
 # Создаем из входных данных файл конфигурации
 echo -e "[main]\ntoken = $bot_token\nhost = $host\nport = $port" > config.ini
