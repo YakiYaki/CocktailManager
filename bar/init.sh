@@ -50,7 +50,7 @@ mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
 
 # Создаем из входных данных файл конфигурации
 echo -e "[main]\ntoken = $bot_token\nhost = $host\nport = $port" > config.ini
-echo -e "[db]\nname = $db_name\nuser = $db_user\npass = $db_pass" > config.ini
+echo -e "[db]\nname = $db_name\nuser = $db_user\npass = $db_pass" >> config.ini
 #cat config.ini
 
 # Добавим необходимые данные для сертификата

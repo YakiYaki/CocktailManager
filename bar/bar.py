@@ -1,7 +1,7 @@
 from flask import Flask, request
 import telebot
 import json
-from models import Cocktail
+
 
 from config import Configuration
 conf = Configuration()
@@ -31,6 +31,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://" + DB_USER + ":" + DB_PAS
 db = SQLAlchemy(app)
 
 #context = (CERT, CERT_KEY)
+
+from models import Cocktail
 
 @app.route('/')
 def hello():
