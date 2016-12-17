@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import telebot
 import json
+import logging
 
 
 from config import Configuration
@@ -30,6 +31,9 @@ app.config.from_object(ProductionConfig)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://" + DB_USER + ":" + DB_PASS + "@localhost/" + DB_NAME
 db = SQLAlchemy(app)
 
+logger = logging.getLogger('bot.log')
+logger.setLevel(logging.DEBUG)
+
 #context = (CERT, CERT_KEY)
 
 from models import Cocktail
@@ -43,9 +47,10 @@ def webhook():
     payload = json.loads(request.data.decode('utf-8'))
     chat_id = payload['message']['chat']['id']
     text = payload['message'].get('text')
-    if text != '':
-        bot.send_message(chat_id, text)
-    elif text == "/start":
+
+    logger.debug(text)
+
+    if text == "/start":
         bot.send_message(chat_id, "Hello! I'm a Cocktail Manager.\nCheck out this commands:\n/list")
     elif text == "/list":
         cocktails = db.session.query(Cocktail).all()
@@ -56,6 +61,8 @@ def webhook():
             bot.send_message(chat_id, ans)
         else:
             bot.send_message(chat_id, "Sorry, there are no cocktails in my memory yet!")
+    elif text != "":
+        bot.send_message(chat_id, text)
     else:
         bot.send_message(chat_id, "There is no text, dude :)")
 

@@ -83,4 +83,8 @@ sudo -u postgres psql -f "conf/db.ini"
 
 chown -R www-data:www-data /$root_path
 
+python3 manage.py db init
+python3 manage.py db migrate
+python3 manage.py db upgrade
+
 exit 0
