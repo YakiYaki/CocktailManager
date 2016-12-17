@@ -3,6 +3,9 @@
 bot_token=$1
 host=$2
 port=$3
+db_name=$4
+db_user=$5
+db_pass=$6
 
 root_path=app
 rep_name=CocktailManager
@@ -20,7 +23,9 @@ export LANGUAGE=en_US.UTF-8
 
 apt-get update
 apt-get -y upgrade
-apt-get install -y python3 python3.5-dev python3-pip libpq-dev nginx  libpcre3 libpcre3-dev
+apt-get install -y postgresql-9.5 postgresql-server-dev-9.5 postgresql-contrib-9.5 \
+				   python3 python3.5-dev python3-pip libpq-dev nginx \
+				   libpcre3 libpcre3-dev
 
 # Находимся мы в CoctailManager/bar (репозиторий)
 # Устанавливаем необходимые компоненты
@@ -45,6 +50,7 @@ mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
 
 # Создаем из входных данных файл конфигурации
 echo -e "[main]\ntoken = $bot_token\nhost = $host\nport = $port" > config.ini
+echo -e "[db]\nname = $db_name\nuser = $db_user\npass = $db_pass" > config.ini
 #cat config.ini
 
 # Добавим необходимые данные для сертификата
@@ -53,7 +59,6 @@ echo "$email" >> conf/ssl.ini
 # Генерация сертификатов
 cat conf/ssl.ini | openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/webhook_cert.key \
 	-x509 -days 3650 -out ssl/webhook_cert.pem
-
 
 # nginx
 # Удаляем настройки по умолчанию и устанавливаем новые
@@ -69,6 +74,12 @@ curl $telegram_url
 echo -e "\nSetting WebHook ---->"
 curl -F $bot_url -F $cert_path $telegram_url
 echo ""
+
+# postgresql
+# Добавляем необходимые настройки и создаем базу
+echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
+echo "listen_addresses='localhost'" >> /etc/postgresql/9.5/main/postgresql.conf
+sudo -u postgres psql -f "conf/db.ini"
 
 chown -R www-data:www-data /$root_path
 
