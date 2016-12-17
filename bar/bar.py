@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
 import telebot
 import json
 
@@ -17,7 +18,6 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'ADAFRUIT'
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 class ProductionConfig(Config):
     DEBUG = False
