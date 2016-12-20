@@ -85,7 +85,7 @@ def filldb():
                     logging.info("Ingredient id exist ====> " + str(ings.id))
                     a.ingredient = ings
                 cocktail.ingredients.append(a)
-
+    '''            
     logging.info("Test data added.")
     logging.info("Adding characteristic data.")
     with open('chars.txt', 'r') as f:
@@ -110,7 +110,7 @@ def filldb():
     			db.session.add(char)
     			db.session.commit()
     			logging.info("successfully added <" + char.name + ">")
-
+	'''
     return "OK"
 
 
@@ -145,6 +145,8 @@ def webhook():
         else:
             bot.send_message(chat_id, "Sorry, there are no cocktails in my memory yet!")
     elif text != "":
+    res = text
+    '''
     	chars = Chars.query.all()
     	ids = []
     	for c in chars:
@@ -161,6 +163,7 @@ def webhook():
     	if res == "":
     		res = "Cocktail is not found :("
 
+    '''
     	bot.send_message(chat_id, res)
 
     return 'OK'
