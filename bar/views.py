@@ -145,8 +145,13 @@ def webhook():
         else:
             bot.send_message(chat_id, "Sorry, there are no cocktails in my memory yet!")
     elif text != "":
-    res = text
-    '''
+    	res = text
+    	bot.send_message(chat_id, res)
+
+    return 'OK'
+
+
+'''
     	chars = Chars.query.all()
     	ids = []
     	for c in chars:
@@ -164,6 +169,3 @@ def webhook():
     		res = "Cocktail is not found :("
 
     '''
-    	bot.send_message(chat_id, res)
-
-    return 'OK'

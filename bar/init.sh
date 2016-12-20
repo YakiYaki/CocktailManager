@@ -132,8 +132,4 @@ then if python3 manage.py db migrate > /dev/null
 else echo -e "can't init database :(\nexit" & exit 1
 fi
 
-python3 manage.py db init
-python3 manage.py db migrate
-python3 manage.py db upgrade
-
 exit 0
