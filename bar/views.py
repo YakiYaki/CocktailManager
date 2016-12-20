@@ -123,7 +123,7 @@ def webhook():
     logger.debug(text)
 
     if text == "/start":
-        bot.send_message(chat_id, "Hello! I'm a Cocktail Manager.\nCheck out this commands:\n/list")
+        bot.send_message(chat_id, "Hello! I'm a Cocktail Manager.\nCheck out this commands:\n/list\n/ingredients")
     elif text == "/list":
         cocks = Cocktail.query.all()
         ans = "List of cocktails:\n"
