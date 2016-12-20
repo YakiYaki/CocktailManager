@@ -125,7 +125,7 @@ def webhook():
     logger.debug(text)
 
     if text == "/start":
-        bot.send_message(chat_id, "Hello! I'm a Cocktail Manager.\nCheck out this commands:\n/list\n/ingredients")
+        bot.send_message(chat_id, "Hello! I'm a Cocktail Manager.\nCheck out this commands:\n/list\n/ingredients\n/cocktail/<num>")
     elif text == "/list":
         cocks = Cocktail.query.all()
         ans = "List of cocktails:\n"
@@ -146,9 +146,10 @@ def webhook():
             bot.send_message(chat_id, ans)
         else:
             bot.send_message(chat_id, "Sorry, there are no cocktails in my memory yet!")
-    elif id = re.findall("\/cocks\/\d+"):
+    elif re.findall("\/cocktail\/\d+"):
     	ans = ""
-    	cocks = Cocktail.query.filter_by(id=id[0])
+    	ids = re.findall("\/cocktail\/\d+")
+    	cocks = Cocktail.query.filter_by(id=int(ids[0][7:]))
     	if cocks != None:
     		for c in cocks:
     			ans += c.name + "\n\n" + c.recipe + "\n\n"
