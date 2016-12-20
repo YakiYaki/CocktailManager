@@ -1,10 +1,14 @@
 import os
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
+import socket
 
-from bar import app, db, ProductionConfig
+from bar import app, db, ProductionConfig, DebugConfig
 
-app.config.from_object(ProductionConfig)
+if socket.gethostname() == 'linux-yaki':
+	app.config.from_object(DebugConfig)
+else:
+	app.config.from_object(ProductionConfig)
 
 migrate = Migrate(app, db)
 manager = Manager(app)
