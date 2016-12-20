@@ -119,6 +119,7 @@ then echo -e "\t[OK]"
 else echo -e "can't create database :(\nexit" & exit 1
 fi
 chown -R www-data:www-data /$root_path
+chmod a+w bot.log
 
 echo "Setting up database"
 if python3 manage.py db init > /dev/null

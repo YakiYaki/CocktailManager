@@ -153,9 +153,9 @@ def webhook():
     	if cocks != None:
     		for c in cocks:
     			ans += c.name + "\n\n" + c.recipe + "\n\n"
-            	for i in c.ingredients:
-                	ans += i.ingredient.name + " " + i.quantity + " " + i.extension + "\n"
-        bot.send_message(chat_id, ans)
+    			for i in c.ingredients:
+    				ans += i.ingredient.name + " " + i.quantity + " " + i.extension + "\n"
+    	bot.send_message(chat_id, ans)
     elif text != "":
     	res = "I don't understand you :("
     	bot.send_message(chat_id, res)
