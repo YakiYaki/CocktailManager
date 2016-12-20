@@ -3,7 +3,7 @@
 if [[ $1 == "" ]]
 then 
 	echo "Please, enter bot token!"
-	exit 0
+	exit 1
 else
 	bot_token=$1
 fi

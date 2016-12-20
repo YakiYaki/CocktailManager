@@ -2,6 +2,7 @@ from bar import app, bot, TOKEN,db
 from flask import render_template, request
 import json
 import logging
+import re
 from models import Cocktail, Ingredient, Association
 
 logging.basicConfig(filename='bot.log',level=logging.DEBUG)
@@ -84,6 +85,20 @@ def filldb():
                     logging.info("Ingredient id exist ====> " + str(ings.id))
                     a.ingredient = ings
                 cocktail.ingredients.append(a)
+
+    logging.info("Test data added.")
+    logging.info("Adding characteristic data.")
+    with open('chars.txt', 'r') as f:
+    	lines = f.readlines()
+    	for l in lines:
+    		if l[0] == '#':
+    			continue
+    		else:
+    			l = l[:-1] # строка для поиска
+    			# ищем по всем ингредиентам и собираем в массив все подходящие коктейли
+    			pass
+
+
 
     return "OK"
 
