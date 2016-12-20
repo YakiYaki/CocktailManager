@@ -75,6 +75,8 @@ def filldb():
                 logging.info("successfully added <" + cocktail.name + ">")
             elif l[0] == '!':
                 break
+            elif l[0] == '&':
+            	continue
             else:
                 ing_items = l.split(',')
                 a = Association(ing_items[1], ing_items[2][:len(ing_items[2])-1])
@@ -144,8 +146,17 @@ def webhook():
             bot.send_message(chat_id, ans)
         else:
             bot.send_message(chat_id, "Sorry, there are no cocktails in my memory yet!")
+    elif id = re.findall("\/cocks\/\d+"):
+    	ans = ""
+    	cocks = Cocktail.query.filter_by(id=id[0])
+    	if cocks != None:
+    		for c in cocks:
+    			ans += c.name + "\n\n" + c.recipe + "\n\n"
+            	for i in c.ingredients:
+                	ans += i.ingredient.name + " " + i.quantity + " " + i.extension + "\n"
+        bot.send_message(chat_id, ans)
     elif text != "":
-    	res = text
+    	res = "I don't understand you :("
     	bot.send_message(chat_id, res)
 
     return 'OK'
