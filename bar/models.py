@@ -38,7 +38,7 @@ class Cocktail(db.Model):
     tags = db.Column(db.String(100))
 
     ingredients = db.relationship("Association", back_populates="cocktail")
-    chars = db.relationship("CharsAssociation", back_populates="char")
+    chars = db.relationship("CharsAssociation", back_populates="cocktail")
 
     def __init__(self, name, recipe, tags):
         self.name = name       
@@ -78,6 +78,9 @@ class Chars(db.Model):
 	name = db.Column(db.String(100), unique=True)
 
 	cocktails = db.relationship("CharsAssociation", back_populates="char")
+
+	def __init__(self, name):
+		self.name = name
 
 class User(db.Model):
 	__tablename__ = 'users'

@@ -3,7 +3,7 @@ from flask import render_template, request
 import json
 import logging
 import re
-from models import Cocktail, Ingredient, Association
+from models import Cocktail, Ingredient, Association, Chars, CharsAssociation
 
 logging.basicConfig(filename='bot.log',level=logging.DEBUG)
 
@@ -95,10 +95,21 @@ def filldb():
     			continue
     		else:
     			l = l[:-1] # строка для поиска
+    			char = Chars(l)    			
     			# ищем по всем ингредиентам и собираем в массив все подходящие коктейли
-    			pass
-
-
+    			ings = Ingredient.query.all()
+    			for i in ings:
+    				res = re.search(l, i.name)
+    				if res != None:
+    					for c in i.cocktails:
+    						a = CharsAssociation()    						
+    						a.cocktail = c
+    						char.cocktails.append(a)
+    				else:
+    					continue    					
+    			db.session.add(char)
+    			db.session.commit()
+    			logging.info("successfully added <" + char.name + ">")
 
     return "OK"
 
@@ -133,5 +144,23 @@ def webhook():
             bot.send_message(chat_id, ans)
         else:
             bot.send_message(chat_id, "Sorry, there are no cocktails in my memory yet!")
+    elif text != "":
+    	chars = Chars.query.all()
+    	ids = []
+    	for c in chars:
+    		result = re.findall(c.name, text)
+    		if len(result) > 0:
+    			ids.append(c.id)
+    		else:
+    			continue
+    	res = ""
+    	for id in ids:
+    		char = Chars.query.filter_by(id=id)
+    		for c in char.cocktails:
+    			res += c.name + "\n"
+    	if res == "":
+    		res = "Cocktail is not found :("
+
+    	bot.send_message(chat_id, res)
 
     return 'OK'
