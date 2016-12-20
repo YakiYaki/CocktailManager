@@ -79,7 +79,7 @@ chmod a+w log/gaccess.log
 mv conf/gunicorn.service /etc/systemd/system/gunicorn.service
 
 # Создаем из входных данных файл конфигурации
-echo -e "[main]\ntoken = $bot_token\nhost = $host\nport = $port" > config.ini
+echo -e "[main]\ntoken = $bot_token\nhost = $host\nport = $port\nkey = 'lolololo'" > config.ini
 echo -e "[db]\nname = $db_name\nuser = $db_user\npass = $db_pass" >> config.ini
 #cat config.ini
 
@@ -131,5 +131,9 @@ then if python3 manage.py db migrate > /dev/null
 	fi
 else echo -e "can't init database :(\nexit" & exit 1
 fi
+
+python3 manage.py db init
+python3 manage.py db migrate
+python3 manage.py db upgrade
 
 exit 0
